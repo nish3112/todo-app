@@ -1,0 +1,96 @@
+<.header>
+  Listing Todos
+  <:actions>
+    <.link patch={~p"/todos/new"}>
+      <.button>New Todo</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<br>  
+
+<form phx-change="search" id="search" >
+  <input class = "search-bar" type="search" placeholder="Search..." name="title" phx-debounce="500">
+
+  
+</form>
+
+<.table 
+  id="todos"
+  rows={@streams.todos}
+>
+  <:col :let={{_id, todo}} label="Title"><%= todo.title %></:col>
+  <:col :let={{_id, todo}} label="Body"><%= todo.body %></:col>
+  <:col :let={{_id, todo}} label="Status"><%= todo.status %></:col>
+  <:col :let={{_id, todo}} label="Liked">
+  <div class="heart-container" title="Like">
+    <input type="checkbox" class="checkbox" id="Give-It-An-Id">
+    <div class="svg-container">
+    </div>
+  <.button phx-click="togglelike" phx-value-todo_id= {todo.id}>
+      <%= if todo.liked do %>
+          <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+          </svg>
+        <% else %>
+        <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+        </svg>
+        <% end %>
+  </.button>
+    <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="10,10 20,20"></polygon>
+      <polygon points="10,50 20,50"></polygon>
+      <polygon points="20,80 30,70"></polygon>
+      <polygon points="90,10 80,20"></polygon>
+      <polygon points="90,50 80,50"></polygon>
+      <polygon points="80,80 70,70"></polygon>
+    </svg>
+    
+  </div>
+</:col>
+  <:action :let={{_id, todo}}>
+    <div class="sr-only">
+      <.link navigate={~p"/todos/#{todo}"}>Show</.link>
+    </div> 
+    <.link patch={~p"/todos/#{todo}/edit"}>Edit</.link>
+    
+  </:action>
+  <:action :let={{id, todo}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: todo.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+
+
+
+<br>
+<div class="bookmark">
+  <button phx-click="bookmark">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-fill" viewBox="0 0 16 16">
+      <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"/>
+    </svg>
+  </button>  
+</div>
+
+
+
+<.modal :if={@live_action in [:new, :edit]} id="todo-modal" show on_cancel={JS.patch(~p"/todos")}>
+  <.live_component
+    module={TodoAppFullWeb.TodoLive.FormComponent}
+    id={@todo.id || :new}
+    title={@page_title}
+    action={@live_action}
+    todo={@todo}
+    patch={~p"/todos"}
+  />
+</.modal>
+
+
+
+
