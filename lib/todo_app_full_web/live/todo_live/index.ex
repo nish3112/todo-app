@@ -13,6 +13,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     todos = Todos.list_todos()
     IO.inspect(todos)
 
+    socket = assign(socket, bookmark: false)
     {:ok, stream(socket, :todos, todos)}
   end
 
@@ -66,23 +67,6 @@ defmodule TodoAppFullWeb.TodoLive.Index do
       String.downcase(todo.title) |> String.contains?(String.downcase(title))
     end)
 
-    # socket
-    # |> stream_delete(:todos, Enum.each(todos, fn x -> x end))
-    # |> stream_insert(:todos, Enum.each(filtered_todos, fn y -> y end))
-
-    # for todo <- todos do
-    #   socket
-    #   |> stream_delete(:todos, todo)
-    # end
-
-    # for todo <- filtered_todos do
-    #   socket
-    #   |> stream_insert(:todos, todo)
-    # end
-
-
-    #{:noreply, socket}
-
     {:noreply, stream(socket, :todos, filtered_todos, reset: true)}
 
   end
@@ -97,13 +81,22 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     {:noreply, stream(socket, :todos, updated_todos)}
   end
 
-
   @impl true
   def handle_event("bookmark", _params, socket) do
     todos = Todos.list_todos()
-    bookmark_todos = Enum.filter(todos, fn todo -> todo.liked == true end)
-   |> IO.inspect()
-    {:noreply, stream(socket, :todos, bookmark_todos)}
+    is_bookmark = socket.assigns[:bookmark]
+    bookmark_todos = Enum.filter(todos, fn todo -> todo.liked == true end) |> IO.inspect()
+
+    if is_bookmark == false  do
+      socket = assign(socket, bookmark: !is_bookmark)
+      {:noreply, stream(socket, :todos, bookmark_todos, reset: true)}
+    else
+      socket = assign(socket, bookmark: !is_bookmark)
+      {:noreply, stream(socket, :todos, todos, reset: true)}
+
+    end
+
+
   end
 
 end
