@@ -2,6 +2,15 @@ defmodule TodoAppFull.Todos.Todo do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {
+    Flop.Schema,
+    filterable: [:title, :status],
+    sortable: [:title, :status],
+    default_limit: 4
+  }
+
+
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "todos" do

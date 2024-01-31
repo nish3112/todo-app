@@ -21,6 +21,15 @@ defmodule TodoAppFull.Todos do
     Repo.all(Todo)
   end
 
+  def list_todos(params) do
+    case Flop.validate_and_run(Todo, params, for: Todo) do
+      {:ok, {todos, meta}} ->
+        %{todos: todos, meta: meta}
+      {:error, meta} ->
+        %{todos: [], meta: meta}
+    end
+  end
+
   @doc """
   Gets a single todo.
 

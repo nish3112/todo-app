@@ -10,11 +10,12 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     # so we stream the content of :todos and we get all the todos i.e. Todos.list_todos() and send it with a :ok atom
     # IO.inspect(socket)
     #{:ok, stream(socket, :todos, Todos.list_todos())}
-    todos = Todos.list_todos()
-    IO.inspect(todos)
+    # todos = Todos.list_todos()
+    # IO.inspect(todos)
 
     socket = assign(socket, bookmark: false)
-    {:ok, stream(socket, :todos, todos)}
+    # {:ok, stream(socket, :todos, todos)}
+    {:ok, stream(socket, :todos, [])}
   end
 
   @impl true
@@ -40,10 +41,16 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     |> assign(:todo, %Todo{})
   end
 
-  defp apply_action(socket, :index, _params) do
+  defp apply_action(socket, :index, params) do
+    # socket
+    # |> assign(:page_title, "Listing Todos")
+    # |> assign(:todo, nil)
+
+    %{todos: todos, meta: meta} = Todos.list_todos(params)
     socket
     |> assign(:page_title, "Listing Todos")
-    |> assign(:todo, nil)
+    |> stream(:todos, todos, reset: true)
+    |> assign(:meta, meta)
   end
 
   @impl true
@@ -62,23 +69,36 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   @impl true
   def handle_event("search", %{"title" => title}, socket) do
+
     todos = Todos.list_todos()
+    IO.inspect(todos, label: "List")
     filtered_todos = Enum.filter(todos, fn todo ->
       String.downcase(todo.title) |> String.contains?(String.downcase(title))
     end)
-
     {:noreply, stream(socket, :todos, filtered_todos, reset: true)}
-
   end
 
   @impl true
   def handle_event("togglelike", %{"todo_id" => todo_id}, socket) do
     todo = TodoAppFull.Todos.get_todo!(todo_id)
     updated_attrs = %{"liked" => !todo.liked}
-    {:ok, _todo} = TodoAppFull.Todos.update_todo(todo, updated_attrs)
+    {:ok, updated_todo} = TodoAppFull.Todos.update_todo(todo, updated_attrs)
 
-    updated_todos = TodoAppFull.Todos.list_todos()
-    {:noreply, stream(socket, :todos, updated_todos)}
+    {:noreply, stream_insert(socket, :todos, updated_todo)}
+  end
+
+  @impl true
+  def handle_event("prev", _params, socket) do
+    todos = TodoAppFull.Todos.list_todos()
+    updated_todos = Enum.slice(todos,0,5)
+    {:noreply, stream(socket, :todos, updated_todos, reset: true)}
+  end
+
+  @impl true
+  def handle_event("next", _params, socket) do
+    todos = TodoAppFull.Todos.list_todos()
+    updated_todos = Enum.slice(todos,5,5)
+    {:noreply, stream(socket, :todos, updated_todos, reset: true)}
   end
 
   @impl true
@@ -89,7 +109,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
     if is_bookmark == false  do
       socket = assign(socket, bookmark: !is_bookmark)
-      {:noreply, stream(socket, :todos, bookmark_todos, reset: true)}
+      {:noreply, stream(socket, :todos, bookmark_todos, reset: true)} |> IO.inspect()
     else
       socket = assign(socket, bookmark: !is_bookmark)
       {:noreply, stream(socket, :todos, todos, reset: true)}

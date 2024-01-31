@@ -7,6 +7,24 @@
   </:actions>
 </.header>
 
+
+
+
+
+
+
+
+<form phx-change="search" id="search" >
+  <input class = "search-bar" type="search" placeholder="Search..." name="title" phx-debounce="500">
+</form>
+
+
+
+
+
+
+
+
 <div class="bookmark">
   <%= if @bookmark do %>
   <button phx-click="bookmark" phx-value="{phx_value}">
@@ -24,74 +42,56 @@
 
 
 
-
-
-
-<form phx-change="search" id="search" >
-  <input class = "search-bar" type="search" placeholder="Search..." name="title" phx-debounce="500">
-
-  
-</form>
-
-<.table 
-  id="todos"
-  rows={@streams.todos}
->
-  <:col :let={{_id, todo}} label="Title"><%= todo.title %></:col>
-  <:col :let={{_id, todo}} label="Body"><%= todo.body %></:col>
-  <:col :let={{_id, todo}} label="Status"><%= todo.status %></:col>
-  <:col :let={{_id, todo}} label="Liked">
-
-
-  <button phx-click="togglelike" phx-value-todo_id= {todo.id}>
-      <%= if todo.liked do %>
-      <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="orange" viewBox="0 0 24 24">
-        <path d="m12.7 20.7 6.2-7.1c2.7-3 2.6-6.5.8-8.7A5 5 0 0 0 16 3c-1.3 0-2.7.4-4 1.4A6.3 6.3 0 0 0 8 3a5 5 0 0 0-3.7 1.9c-1.8 2.2-2 5.8.8 8.7l6.2 7a1 1 0 0 0 1.4 0Z"/>
-      </svg>
-      
-        <% else %>
-        <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6C6.5 1 1 8 5.8 13l6.2 7 6.2-7C23 8 17.5 1 12 6Z"/>
+<div class="card-region" id="card-region" phx-update="stream">
+  <%= for {id,todo} <- @streams.todos do %>
+    <div class="card shadow" id={id}>
+      <p>Title: <%= todo.title %> </p>
+      <p>Body: <%= todo.body %></p>
+      <p>Status: <%= todo.status %> </p>
+      <button phx-click="togglelike" phx-value-todo_id= {todo.id}>
+        <%= if todo.liked do %>
+        <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="orange" viewBox="0 0 24 24">
+          <path d="m12.7 20.7 6.2-7.1c2.7-3 2.6-6.5.8-8.7A5 5 0 0 0 16 3c-1.3 0-2.7.4-4 1.4A6.3 6.3 0 0 0 8 3a5 5 0 0 0-3.7 1.9c-1.8 2.2-2 5.8.8 8.7l6.2 7a1 1 0 0 0 1.4 0Z"/>
         </svg>
-        <% end %>
-  </button>
-    
-</:col>
-  <:action :let={{_id, todo}}>
-    <div class="sr-only">
-      <.link navigate={~p"/todos/#{todo}"}>Show</.link>
-    </div> 
-    <.link patch={~p"/todos/#{todo}/edit"}>Edit</.link>
-    
-  </:action>
-  <:action :let={{id, todo}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: todo.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
-</.table>
+        
+        <% else %>
+          <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6C6.5 1 1 8 5.8 13l6.2 7 6.2-7C23 8 17.5 1 12 6Z"/>
+          </svg>
+         <% end %>
+    </button>
+      <div class="sr-only">
+        <.link navigate={~p"/todos/#{todo}"}>Show</.link>
+      </div> 
+      <.link patch={~p"/todos/#{todo}/edit"}>Edit</.link>
+      
+      <.link
+        phx-click={JS.push("delete", value: %{id: todo.id}) |> hide("##{id}")}
+        data-confirm="Are you sure?"
+      >
+        Delete
+      </.link>
+
+    </div>
+  <% end %>
+  </div>
+
+  <Flop.Phoenix.pagination opts={TodoAppFullWeb.FlopConfig.pagination_opts()} meta={@meta} path={~p"/todos"}/>
 
 
 
 
-<br>
 
-
-
-<.modal :if={@live_action in [:new, :edit]} id="todo-modal" show on_cancel={JS.patch(~p"/todos")}>
-  <.live_component
-    module={TodoAppFullWeb.TodoLive.FormComponent}
-    id={@todo.id || :new}
-    title={@page_title}
-    action={@live_action}
-    todo={@todo}
-    patch={~p"/todos"}
-  />
-</.modal>
-
-
-
-
+  <.modal :if={@live_action in [:new, :edit]} id="todo-modal" show on_cancel={JS.patch(~p"/todos")}>
+    <.live_component
+      module={TodoAppFullWeb.TodoLive.FormComponent}
+      id={@todo.id || :new}
+      title={@page_title}
+      action={@live_action}
+      todo={@todo}
+      patch={~p"/todos"}
+    />
+  </.modal>
+  
+  
+  

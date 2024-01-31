@@ -22,6 +22,9 @@ config :todo_app_full, TodoAppFullWeb.Endpoint,
   pubsub_server: TodoAppFull.PubSub,
   live_view: [signing_salt: "I4RpR07K"]
 
+config :flop,
+    repo: TodoAppFull.Repo
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
