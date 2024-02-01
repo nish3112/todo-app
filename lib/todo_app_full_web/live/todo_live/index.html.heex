@@ -63,20 +63,22 @@
       <div class="sr-only">
         <.link navigate={~p"/todos/#{todo}"}>Show</.link>
       </div> 
-      <.link patch={~p"/todos/#{todo}/edit"}>Edit</.link>
+      <.link patch={~p"/todos/#{todo}/edit"}>
+        <svg width="24" height="24" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M13.0207 5.82839L15.8491 2.99996L20.7988 7.94971L17.9704 10.7781M13.0207 5.82839L3.41405 15.435C3.22652 15.6225 3.12116 15.8769 3.12116 16.1421V20.6776H7.65669C7.92191 20.6776 8.17626 20.5723 8.3638 20.3847L17.9704 10.7781M13.0207 5.82839L17.9704 10.7781" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> </svg>
+      </.link>
       
       <.link
         phx-click={JS.push("delete", value: %{id: todo.id}) |> hide("##{id}")}
         data-confirm="Are you sure?"
       >
-        Delete
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4V4zm2 2h6V4H9v2zM6.074 8l.857 12H17.07l.857-12H6.074z" fill="#0D0D0D"/></svg>
       </.link>
 
     </div>
   <% end %>
   </div>
 
-  <Flop.Phoenix.pagination opts={TodoAppFullWeb.FlopConfig.pagination_opts()} meta={@meta} path={~p"/todos"}/>
+  <!-- <Flop.Phoenix.pagination opts={TodoAppFullWeb.FlopConfig.pagination_opts()} meta={@meta} path={~p"/todos"}/> -->
 
 
 
@@ -85,6 +87,7 @@
   <.modal :if={@live_action in [:new, :edit]} id="todo-modal" show on_cancel={JS.patch(~p"/todos")}>
     <.live_component
       module={TodoAppFullWeb.TodoLive.FormComponent}
+      current_user={@session_id}
       id={@todo.id || :new}
       title={@page_title}
       action={@live_action}

@@ -6,7 +6,6 @@ defmodule TodoAppFull.Todos.Todo do
     Flop.Schema,
     filterable: [:title, :status],
     sortable: [:title, :status],
-    default_limit: 4
   }
 
 
@@ -18,6 +17,7 @@ defmodule TodoAppFull.Todos.Todo do
     field :title, :string
     field :body, :string
     field :liked, :boolean, default: false
+    belongs_to :user , TodoAppFull.Accounts.User
 
     timestamps(type: :utc_datetime)
   end
@@ -25,7 +25,7 @@ defmodule TodoAppFull.Todos.Todo do
   @doc false
   def changeset(todo, attrs) do
     todo
-    |> cast(attrs, [:title, :body, :status, :liked])
-    |> validate_required([:title, :body, :status, :liked])
+    |> cast(attrs, [:title, :body, :status, :liked, :user_id])
+    |> validate_required([:title, :body, :status, :liked, :user_id])
   end
 end

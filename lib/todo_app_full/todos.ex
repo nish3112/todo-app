@@ -17,18 +17,21 @@ defmodule TodoAppFull.Todos do
       [%Todo{}, ...]
 
   """
-  def list_todos do
-    Repo.all(Todo)
+  def list_todos(u_id) do
+    IO.inspect(u_id)
+    Todo
+        |> where([t], (t.user_id == ^u_id))
+        |> Repo.all()
   end
 
-  def list_todos(params) do
-    case Flop.validate_and_run(Todo, params, for: Todo) do
-      {:ok, {todos, meta}} ->
-        %{todos: todos, meta: meta}
-      {:error, meta} ->
-        %{todos: [], meta: meta}
-    end
-  end
+  # def list_todos(params) do
+  #   case Flop.validate_and_run(Todo, params, for: Todo) do
+  #     {:ok, {todos, meta}} ->
+  #       %{todos: todos, meta: meta}
+  #     {:error, meta} ->
+  #       %{todos: [], meta: meta}
+  #   end
+  # end
 
   @doc """
   Gets a single todo.

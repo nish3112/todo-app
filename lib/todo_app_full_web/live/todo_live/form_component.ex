@@ -1,4 +1,5 @@
 defmodule TodoAppFullWeb.TodoLive.FormComponent do
+  alias TodoAppFull.Accounts
   use TodoAppFullWeb, :live_component
 
   alias TodoAppFull.Todos
@@ -54,7 +55,9 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
   end
 
   def handle_event("save", %{"todo" => todo_params}, socket) do
-    save_todo(socket, socket.assigns.action, todo_params)
+    current_user_id = Accounts.get_user_by_session_token(socket.assigns.current_user).id
+    updated_todo_params = Map.put_new(todo_params, "user_id", current_user_id)
+    save_todo(socket, socket.assigns.action, updated_todo_params)
   end
 
   defp save_todo(socket, :edit, todo_params) do
