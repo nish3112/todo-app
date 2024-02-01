@@ -18,7 +18,7 @@ defmodule TodoAppFullWeb.Router do
   end
 
   scope "/", TodoAppFullWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_authenticated_user]
 
     get "/", PageController, :home
 
