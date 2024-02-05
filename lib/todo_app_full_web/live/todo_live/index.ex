@@ -31,10 +31,13 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     socket
     |> assign(:page_title, "Edit Todo")
     |> assign(:todo, Todos.get_todo!(id))
+
   end
 
   defp apply_action(socket, :new, _params) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
+
+    dbg(todos)
 
     socket
     |> assign(:page_title, "New Todo")
@@ -44,10 +47,13 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   defp apply_action(socket, :index, _params) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
+    IO.inspect(todos)
+    # dbg(todos)
     sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 5, 5)
     socket
     |> assign(:page_title, "Listing Todos")
     |> stream(:todos, sorted_todos, reset: true)
+
 
   end
 
@@ -56,8 +62,6 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
 
     sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 5, 5)
-
-
 
     {:noreply, stream(socket,:todos, sorted_todos, reset: true)}
 
@@ -102,9 +106,14 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   @impl true
   def handle_event("togglelike", %{"todo_id" => todo_id}, socket) do
+
     todo = TodoAppFull.Todos.get_todo!(todo_id)
+
     updated_attrs = %{"liked" => !todo.liked}
-    {:ok, updated_todo} = TodoAppFull.Todos.update_todo(todo, updated_attrs)
+    # {:ok, updated_todo} = TodoAppFull.Todos.update_todo(todo, updated_attrs)
+
+    {:ok, updated_todo} = TodoAppFull.Repo.get_by(TodoAppFull.Todos.Todo, id: todo_id) |> TodoAppFull.Repo.preload(:category) |>  TodoAppFull.Todos.update_todo(updated_attrs)
+
 
     {:noreply, stream_insert(socket, :todos, updated_todo)}
   end

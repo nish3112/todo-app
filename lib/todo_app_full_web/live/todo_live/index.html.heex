@@ -31,19 +31,6 @@
 
 
 
-<form phx-change="sortTodos" id="temp" >
-  <input type="radio" id="completed" name="status" value="" >
-  <label for="completed">All</label>
-
-  <input type="radio" id="completed" name="status" value="completed" >
-  <label for="completed">Completed</label>
-
-  <input type="radio" id="inprogress" name="status" value="in-progress" >
-  <label for="inprogress">In Progress</label>
-
-  <input type="radio" id="onhold" name="status" value="on-hold">
-  <label for="onhold">On Hold</label>
-</form>
 
 
 
@@ -55,6 +42,7 @@
       <p class="title">Title: <%= todo.title %> </p>
       <p class="body">Body: <%= todo.body %></p>
       <p class="status">Status: <%= todo.status %> </p>
+      <p class="status">Category: <%= todo.category.category_name %> </p>
       <button phx-click="togglelike" phx-value-todo_id= {todo.id}>
         <%= if todo.liked do %>
         <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="orange" viewBox="0 0 24 24">
