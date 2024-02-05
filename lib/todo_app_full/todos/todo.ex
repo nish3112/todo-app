@@ -18,14 +18,14 @@ defmodule TodoAppFull.Todos.Todo do
     field :body, :string
     field :liked, :boolean, default: false
     belongs_to :user , TodoAppFull.Accounts.User
-
+    belongs_to :category, TodoAppFull.Categories.Category
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(todo, attrs) do
     todo
-    |> cast(attrs, [:title, :body, :status, :liked, :user_id])
-    |> validate_required([:title, :body, :status, :liked, :user_id])
+    |> cast(attrs, [:title, :body, :status, :liked, :user_id, :category_id])
+    |> validate_required([:title, :body, :status, :liked, :user_id, :category_id])
   end
 end

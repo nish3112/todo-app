@@ -1,4 +1,5 @@
 defmodule TodoAppFullWeb.TodoLive.Index do
+  alias TodoAppFull.Categories
   alias TodoAppFull.Accounts
   use TodoAppFullWeb, :live_view
 
@@ -7,9 +8,11 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
+    categories = Categories.list_categories()
     socket = assign(socket, bookmark: false)
     socket = assign(socket, session_id: session["user_token"])
     socket = assign(socket, page_number: 0)
+    socket = assign(socket, categories: categories)
     {:ok, stream(socket, :todos, [])}
   end
 
@@ -21,7 +24,6 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
 
   def handle_params(params, _url, socket) do
-    IO.inspect("Handle params called")
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -40,12 +42,9 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     |> assign(:max_pg_number, div(length(todos), 5) )
   end
 
-  defp apply_action(socket, :index, params) do
-    IO.inspect("apply action called again-----")
+  defp apply_action(socket, :index, _params) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
-    IO.inspect(params)
     sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 5, 5)
-    IO.inspect("I am called sort wala")
     socket
     |> assign(:page_title, "Listing Todos")
     |> stream(:todos, sorted_todos, reset: true)
@@ -57,8 +56,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
 
     sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 5, 5)
-    IO.inspect(sorted_todos)
-    IO.inspect("I am called sort wala")
+
 
 
     {:noreply, stream(socket,:todos, sorted_todos, reset: true)}
@@ -133,18 +131,16 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   end
 
     @impl true
-    def handle_event("next", %{"id" => temp_pg_no}, socket) do
-      IO.inspect(temp_pg_no)
+    def handle_event("next", %{"id" => _temp_pg_no}, socket) do
       update_page_num = socket.assigns.page_number + 1
       updated_socket = assign(socket, page_number: update_page_num)
-      IO.inspect(updated_socket)
       pagination_helper(updated_socket)
 
     end
 
     @impl true
-    def handle_event("previous", %{"id" => temp_pg_no}, socket) do
-      IO.inspect(temp_pg_no)
+    def handle_event("previous", %{"id" => _temp_pg_no}, socket) do
+
       update_page_num = socket.assigns.page_number - 1
       if update_page_num < 0 do
         updated_socket = assign(socket, page_number: 0)

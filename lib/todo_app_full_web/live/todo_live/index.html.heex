@@ -87,6 +87,7 @@
     <.live_component
       module={TodoAppFullWeb.TodoLive.FormComponent}
       current_user={@session_id}
+      categories={@categories}
       id={@todo.id || :new}
       title={@page_title}
       action={@live_action}
