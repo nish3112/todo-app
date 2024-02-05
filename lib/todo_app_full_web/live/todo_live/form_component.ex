@@ -21,10 +21,9 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
       >
         <.input field={@form[:title]} type="text" label="Title" />
         <.input field={@form[:body]} type="text" label="Body" />
-        <.input field={@form[:status]} type="select" value={"Vegetarian"} label = "Status"
+        <.input field={@form[:status]} type="select" label = "Status"
           options={[{"in-progress", "in-progress"}, {"completed", "completed"}, {"on-hold", "on-hold"}]}>
         </.input>
-
         <.input field={@form[:liked]} type="checkbox" label="Liked" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Todo</.button>
