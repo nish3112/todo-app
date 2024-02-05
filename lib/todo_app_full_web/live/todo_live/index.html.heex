@@ -31,6 +31,22 @@
 
 
 
+<form phx-change="sortTodos" id="temp" >
+  <input type="radio" id="completed" name="status" value="" >
+  <label for="completed">All</label>
+
+  <input type="radio" id="completed" name="status" value="completed" >
+  <label for="completed">Completed</label>
+
+  <input type="radio" id="inprogress" name="status" value="in-progress" >
+  <label for="inprogress">In Progress</label>
+
+  <input type="radio" id="onhold" name="status" value="on-hold">
+  <label for="onhold">On Hold</label>
+</form>
+
+
+
 
 <div class="card-region" id="card-region" phx-update="stream">
   <%= for {id,todo} <- @streams.todos do %>

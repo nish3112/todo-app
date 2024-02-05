@@ -154,6 +154,22 @@ defmodule TodoAppFullWeb.TodoLive.Index do
       end
     end
 
+    @impl true
+    def handle_event("sortTodos", %{"status" => status}, socket) do
+      dbg(status)
+      todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
+
+      if status == "" do
+        pagination_helper(socket)
+      else
+        filtered_todos = Enum.filter(todos, fn todo ->
+          todo.status == status
+        end)
+        {:noreply, stream(socket, :todos, filtered_todos, reset: true)}
+      end
+
+
+    end
 
 
 
