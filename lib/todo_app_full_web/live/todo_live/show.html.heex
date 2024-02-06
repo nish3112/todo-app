@@ -2,21 +2,11 @@
 
 
 <.header>
-  Todo <%= @todo.id %>
-  <:subtitle>This is a todo record from your database.</:subtitle>
-  <:actions>
-    <.link patch={~p"/todos/#{@todo}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit todo</.button>
-    </.link>
-  </:actions>
+  <h1>Sub todos for todo : <%= @todo.id %> </h1>
 </.header>
 
-<.list>
-  <:item title="Title"><%= @todo.title %></:item>
-  <:item title="Body"><%= @todo.body %></:item>
-  <:item title="Status"><%= @todo.status %></:item>
-  <:item title="Liked"><%= @todo.liked %></:item>
-</.list>
+
+<p>Show the sub todos here</p>
 
 <.back navigate={~p"/todos"}>Back to todos</.back>
 

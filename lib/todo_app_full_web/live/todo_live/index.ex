@@ -47,7 +47,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   defp apply_action(socket, :index, _params) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
-    IO.inspect(todos)
+    # IO.inspect(todos)
     # dbg(todos)
     sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 5, 5)
     socket
@@ -74,8 +74,10 @@ defmodule TodoAppFullWeb.TodoLive.Index do
           {TodoAppFullWeb.TodoLive.FormComponent, {:saved, any()}},
           Phoenix.LiveView.Socket.t()
         ) :: {:noreply, map()}
+
   def handle_info({TodoAppFullWeb.TodoLive.FormComponent, {:saved, todo}}, socket) do
-    {:noreply, stream_insert(socket, :todos, todo)}
+    todo = TodoAppFull.Repo.preload(todo, :category)
+    {:noreply, stream_insert(socket, :todos, todo, at: 0)}
   end
 
   @impl true

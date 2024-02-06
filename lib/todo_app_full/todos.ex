@@ -8,6 +8,8 @@ defmodule TodoAppFull.Todos do
 
   alias TodoAppFull.Todos.Todo
 
+
+
   @doc """
   Returns the list of todos.
 
@@ -20,7 +22,9 @@ defmodule TodoAppFull.Todos do
   def list_todos(u_id) do
     IO.inspect(u_id)
     Todo
+
         |> where([t], (t.user_id == ^u_id))
+        |> Repo.preload(:category)
         |> Repo.all()
   end
 
@@ -67,6 +71,7 @@ defmodule TodoAppFull.Todos do
   """
   def create_todo(attrs \\ %{}) do
     %Todo{}
+    |> Repo.preload(:category)
     |> Todo.changeset(attrs)
     |> Repo.insert()
   end
@@ -84,7 +89,10 @@ defmodule TodoAppFull.Todos do
 
   """
   def update_todo(%Todo{} = todo, attrs) do
+    dbg(todo)
+    dbg(attrs)
     todo
+    |> Repo.preload(:category)
     |> Todo.changeset(attrs)
     |> Repo.update()
   end

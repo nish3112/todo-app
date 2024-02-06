@@ -8,6 +8,7 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     {:ok, socket}
   end
 
+
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     {:noreply,
