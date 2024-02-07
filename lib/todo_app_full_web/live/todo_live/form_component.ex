@@ -49,7 +49,7 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"todo" => todo_params}, socket) do
-    IO.inspect(todo_params, label: "xyz")
+    # IO.inspect(todo_params, label: "xyz")
     changeset =
       socket.assigns.todo
       |> TodoAppFull.Repo.preload(:category)

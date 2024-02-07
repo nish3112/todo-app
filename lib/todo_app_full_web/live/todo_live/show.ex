@@ -21,24 +21,22 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
   defp apply_action(socket, :show, params) do
     %{"id" => id} = params
-    x = socket
+    socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:todo, Todos.get_todo!(id))
     |> stream(:subtasks, Todos.get_todo!(id).subtasks)
 
-    IO.inspect(x)
 
-    x
   end
 
 
   defp apply_action(socket, :new, _params) do
-    IO.inspect(socket, label: "before")
+    # IO.inspect(socket, label: "before")
     temp = socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:subtask, %TodoAppFull.Subtasks.Subtask{})
 
-    IO.inspect(temp, label: "after")
+    # IO.inspect(temp, label: "after")
 
     temp
 

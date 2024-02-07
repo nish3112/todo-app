@@ -30,8 +30,8 @@ end
 
 @impl true
 def update(%{subtask: subtask} = assigns, socket) do
-  IO.inspect(assigns, label: "Assigns of update")
-  IO.inspect(subtask)
+  # IO.inspect(assigns, label: "Assigns of update")
+  # IO.inspect(subtask)
   changeset = TodoAppFull.Subtasks.change_subtask(subtask)
 
   {:ok,
