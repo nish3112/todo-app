@@ -19,6 +19,7 @@ defmodule TodoAppFull.Todos.Todo do
     field :liked, :boolean, default: false
     belongs_to :user , TodoAppFull.Accounts.User
     belongs_to :category, TodoAppFull.Categories.Category
+    has_many :subtasks, TodoAppFull.Subtasks.Subtask
     timestamps(type: :utc_datetime)
   end
 

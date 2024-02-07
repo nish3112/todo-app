@@ -24,7 +24,7 @@ defmodule TodoAppFull.Todos do
     Todo
 
         |> where([t], (t.user_id == ^u_id))
-        |> Repo.preload(:category)
+        |> Repo.preload([:category, :subtasks])
         |> Repo.all()
   end
 
@@ -52,9 +52,11 @@ defmodule TodoAppFull.Todos do
 
   """
   def get_todo!(id) do
-    Todo
+    todo = Todo
     |> Repo.get!(id)
-    |> Repo.preload(:category)
+    |> Repo.preload([:category, :subtasks])
+    dbg(todo)
+    todo
   end
 
   @doc """

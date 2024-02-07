@@ -28,6 +28,15 @@ defmodule TodoAppFullWeb.Router do
 
     live "/todos/:id", TodoLive.Show, :show
     live "/todos/:id/show/edit", TodoLive.Show, :edit
+
+    # New paths
+
+    live "/todos/:id/show/new", TodoLive.Show, :new
+    live "/todos/:id/edit/:task_id", TodoLive.Show, :sub_edit
+
+
+
+
   end
 
   # Other scopes may use custom stacks.
