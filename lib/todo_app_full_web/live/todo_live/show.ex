@@ -9,17 +9,10 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     {:ok, socket}
   end
 
-  # def mount(_params, _session, socket) do
-  #   changeset = TodoAppFull.Subtasks.Subtask.changeset(%TodoAppFull.Subtasks.Subtask{}, %{})
-  #   new_socket = assign(socket, :form, to_form(changeset))
-  #   IO.inspect(new_socket, label: "HEllo")
-  #   {:ok, new_socket}
-  # end
-
-
 
   @impl true
   def handle_params(params, _, socket) do
+
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -28,17 +21,27 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
   defp apply_action(socket, :show, params) do
     %{"id" => id} = params
-    socket
+    x = socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:todo, Todos.get_todo!(id))
     |> stream(:subtasks, Todos.get_todo!(id).subtasks)
+
+    IO.inspect(x)
+
+    x
   end
 
 
   defp apply_action(socket, :new, _params) do
-    socket
+    IO.inspect(socket, label: "before")
+    temp = socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:subtask, %TodoAppFull.Subtasks.Subtask{})
+
+    IO.inspect(temp, label: "after")
+
+    temp
+
   end
 
   defp apply_action(socket, :sub_edit, params) do
@@ -49,12 +52,14 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   end
 
 
+
   @impl true
   def handle_event("delete", %{"subtask-id" => subtask_id}, socket) do
     subtask = TodoAppFull.Subtasks.get_subtask!(subtask_id)
     TodoAppFull.Subtasks.delete_subtask(subtask)
-    {:noreply, socket}
-    # {:noreply, stream(socket, :subtasks, [], reset: true)}
+    all_subtasks = TodoAppFull.Subtasks.list_subtasks(socket.assigns.todo.id)
+
+    {:noreply, stream(socket, :subtasks, all_subtasks, reset: true)}
 
   end
 
