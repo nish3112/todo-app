@@ -14,6 +14,7 @@
   <input class = "search-bar" type="search" placeholder="Search..." name="title" phx-debounce="500">
 </form>
 
+<br>
 
 <div class="bookmark">
   <%= if @bookmark do %>
@@ -29,45 +30,51 @@
   <% end %>  
 </div>
 
-
-
 <div class="card-region" id="card-region" phx-update="stream">
-  <%= for {id,todo} <- @streams.todos do %>
+  <%= for {id, todo} <- @streams.todos do %>
     <div class="card shadow" id={id}>
-      <img src="data:image/jpeg;base64,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" alt="FF ">
+      <img src={~p"/images/static_bg.jpeg"} />
       <p class="title">Title: <%= todo.title %> </p>
       <p class="body">Body: <%= todo.body %></p>
       <p class="status">Status: <%= todo.status %> </p>
       <p class="status">Category: <%= if todo.category != nil, do: todo.category.category_name, else: "Uncategorized" %> </p>
-      <button phx-click="togglelike" phx-value-todo_id= {todo.id}>
-        <%= if todo.liked do %>
-        <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="orange" viewBox="0 0 24 24">
-          <path d="m12.7 20.7 6.2-7.1c2.7-3 2.6-6.5.8-8.7A5 5 0 0 0 16 3c-1.3 0-2.7.4-4 1.4A6.3 6.3 0 0 0 8 3a5 5 0 0 0-3.7 1.9c-1.8 2.2-2 5.8.8 8.7l6.2 7a1 1 0 0 0 1.4 0Z"/>
-        </svg>
-        
-        <% else %>
-          <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6C6.5 1 1 8 5.8 13l6.2 7 6.2-7C23 8 17.5 1 12 6Z"/>
+
+      <div class="button-container flex space-x-2">
+        <button phx-click="togglelike" phx-value-todo_id={todo.id}>
+          <%= if todo.liked do %>
+            <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="orange" viewBox="0 0 24 24">
+              <path d="m12.7 20.7 6.2-7.1c2.7-3 2.6-6.5.8-8.7A5 5 0 0 0 16 3c-1.3 0-2.7.4-4 1.4A6.3 6.3 0 0 0 8 3a5 5 0 0 0-3.7 1.9c-1.8 2.2-2 5.8.8 8.7l6.2 7a1 1 0 0 0 1.4 0Z"/>
+            </svg>
+          <% else %>
+            <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6C6.5 1 1 8 5.8 13l6.2 7 6.2-7C23 8 17.5 1 12 6Z"/>
+            </svg>
+          <% end %>
+        </button>
+
+        <.link navigate={~p"/todos/#{todo}"}>
+          <img src={~p"/images/eye-show.png"} width="30px" height="30px" />
+        </.link>
+
+        <.link patch={~p"/todos/#{todo}/edit"}>
+          <svg class="w-6 h-6" width="24" height="24" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13.0207 5.82839L15.8491 2.99996L20.7988 7.94971L17.9704 10.7781M13.0207 5.82839L3.41405 15.435C3.22652 15.6225 3.12116 15.8769 3.12116 16.1421V20.6776H7.65669C7.92191 20.6776 8.17626 20.5723 8.3638 20.3847L17.9704 10.7781M13.0207 5.82839L17.9704 10.7781" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-         <% end %>
-      </button>
-      
-     <.link navigate={~p"/todos/#{todo}"}>Show</.link>
-      
-      <.link patch={~p"/todos/#{todo}/edit"}>
-        <svg width="24" height="24" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M13.0207 5.82839L15.8491 2.99996L20.7988 7.94971L17.9704 10.7781M13.0207 5.82839L3.41405 15.435C3.22652 15.6225 3.12116 15.8769 3.12116 16.1421V20.6776H7.65669C7.92191 20.6776 8.17626 20.5723 8.3638 20.3847L17.9704 10.7781M13.0207 5.82839L17.9704 10.7781" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> </svg>
-      </.link>
-      
-      <.link
-        phx-click={JS.push("delete", value: %{id: todo.id}) |> hide("##{id}")}
-        data-confirm="Are you sure?"
-      >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4V4zm2 2h6V4H9v2zM6.074 8l.857 12H17.07l.857-12H6.074z" fill="#0D0D0D"/></svg>
-      </.link>
+        </.link>
+
+        <.link phx-click={JS.push("delete", value: %{id: todo.id}) |> hide("##{id}")}
+               data-confirm="Are you sure?">
+          <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4V4zm2 2h6V4H9v2zM6.074 8l.857 12H17.07l.857-12H6.074z" fill="#0D0D0D"/>
+          </svg>
+        </.link>
+      </div>
 
     </div>
   <% end %>
-  </div>
+</div>
+
+
   
 
   <div class="pagination">

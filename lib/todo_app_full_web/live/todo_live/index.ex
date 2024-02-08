@@ -49,7 +49,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     # IO.inspect(todos)
     # dbg(todos)
-    sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 5, 5)
+    sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 6, 6)
     socket
     |> assign(:page_title, "Listing Todos")
     |> stream(:todos, sorted_todos, reset: true)
@@ -61,7 +61,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     dbg(socket)
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
 
-    sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 5, 5)
+    sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 6, 6)
 
     {:noreply, stream(socket,:todos, sorted_todos, reset: true)}
 
@@ -98,7 +98,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     end)
 
     if String.length(title) == 0 do
-      {:noreply, stream(socket, :todos, todos |> Enum.sort() |> Enum.reverse() |> Enum.slice(0,5) ,reset: true)}
+      {:noreply, stream(socket, :todos, todos |> Enum.sort() |> Enum.reverse() |> Enum.slice(0,6) ,reset: true)}
     else
       {:noreply, stream(socket, :todos, filtered_todos, reset: true)}
     end
@@ -135,7 +135,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
       socket = assign(socket, page_number: 0)
 
       #{:noreply, stream(socket, :todos, todos, reset: true)}
-      {:noreply, stream(socket, :todos, todos |> Enum.sort() |> Enum.reverse() |> Enum.slice(0,5) ,reset: true)}
+      {:noreply, stream(socket, :todos, todos |> Enum.sort() |> Enum.reverse() |> Enum.slice(0,6) ,reset: true)}
 
     end
 
