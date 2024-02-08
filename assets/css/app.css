@@ -201,3 +201,12 @@
 .eye-icon{
   margin-top: 25px;
 }
+
+
+
+.bookmark-radio{
+  display: flex;
+    justify-content: space-between;
+}
+
+
