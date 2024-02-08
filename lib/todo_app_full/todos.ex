@@ -22,7 +22,6 @@ defmodule TodoAppFull.Todos do
   def list_todos(u_id) do
     IO.inspect(u_id)
     Todo
-
         |> where([t], (t.user_id == ^u_id))
         |> Repo.preload([:category, :subtasks])
         |> Repo.all()
