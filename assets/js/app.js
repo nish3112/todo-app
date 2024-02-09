@@ -40,3 +40,9 @@ liveSocket.connect()
 window.liveSocket = liveSocket
 
 
+// Copy to clipboard
+
+window.addEventListener("phx:copy", (event) => {
+    let text = "http://localhost:4000/todos/" + event.target.value;
+      navigator.clipboard.writeText(text)
+})

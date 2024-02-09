@@ -1,10 +1,46 @@
 @import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
 
+@import "tailwindcss/utilities"; 
+
+
+
+.main {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+.filters{
+  width: 20%;
+  background-color: #332941;
+  padding: 20px;
+  flex-grow: 1;
+  resize: horizontal;
+  overflow: auto;
+  border-radius: 50px 0 0px 50px;
+}
+
+.todos-area {
+  flex-grow: 3;
+  width: 75%;
+  background-color: #65637e;
+  padding: 20px;
+  border-radius: 0 50px 50px 0;
+}
+
+
+.status-filter{
+  border: 3px solid black;
+  margin: 1%;
+}
+
+
+/* --------------------------- */
 
 .search-bar{
   width: 100%;
+  margin-top: 2%;
+  margin-bottom: 2%;
 }
 
 .button-5{
@@ -93,7 +129,7 @@
   background: #f1f1f3;
   box-shadow: 0px 8px 16px 0px rgb(0 0 0 / 3%);
   position: relative;
-  margin: 5px;
+  margin: 15px;
   display: flex;
   flex-direction: column;
 }
@@ -207,6 +243,27 @@
 .bookmark-radio{
   display: flex;
     justify-content: space-between;
+}
+
+
+.selected-todo {
+  color: #f1f1f3;
+  padding: 20px; 
+  border-radius: 10px; 
+}
+
+.selected-todo h2 {
+  font-size: 75px; 
+  margin-bottom: 10px; 
+}
+
+.selected-todo p {
+  font-size: 32px; /* Regular font size for the content */
+  color: #fff; /* White text color */
+}
+
+.selected-todo strong {
+  font-weight: bold; /* Bold text for strong elements */
 }
 
 

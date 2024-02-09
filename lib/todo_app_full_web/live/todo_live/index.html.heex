@@ -9,14 +9,13 @@
 
 
 
+<div class="index-page">
 
-<form phx-change="search" id="search" >
-  <input class = "search-bar" type="search" placeholder="Search..." name="title" phx-debounce="500">
-</form>
-
-<br>
-
-<div class="bookmark-radio">
+  <div class="search-bar">
+    <form phx-change="search" id="search" >
+      <input class = "search-bar" type="search" placeholder="Search..." name="title" phx-debounce="500">
+    </form>
+  </div>
 
   <div class="bookmark">
     <%= if @bookmark do %>
@@ -33,68 +32,118 @@
       </button>
     <% end %>
     <br>
+  </div>
+  
 
+  <div class="main">
+    <div class="filters">
+    
+      <div class="status-filter">
+        
+        Sort by status
+
+        <form phx-change="sortTodos" >
+          <input type="radio" id="all" name="status" value="all" >
+          <label for="completed">All</label> <br>
+          <input type="radio" id="completed" name="status" value="completed" >
+          <label for="completed">Completed</label> <br>
+          <input type="radio" id="inprogress" name="status" value="in-progress" >
+          <label for="inprogress">In Progress</label> <br>
+          <input type="radio" id="onhold" name="status" value="on-hold">
+          <label for="onhold">On Hold</label>
+        </form>    
+      </div>
+
+
+      <div class="category-filter">
+        <label>Category:</label><br/>
+        <form phx-change="sortTodosCategories">
+          <input type="radio" id="gaming" name="category" value="Gaming">
+          <label for="gaming">Gaming</label> <br>
+          <input type="radio" id="essential" name="category" value="Essential">
+          <label for="essential">Essential</label> <br>
+          <input type="radio" id="study" name="category" value="Study">
+          <label for="study">Study</label> <br>
+          <input type="radio" id="coding" name="category" value="Coding">
+          <label for="coding">Coding</label>
+        </form>
+        
+      </div>
+    </div>
+
+
+
+    <div class="todos-area">
+      <div class="card-region" id="card-region" phx-update="stream">
+        <%= for {id, todo} <- @streams.todos do %>
+          <div class="card shadow" id={id}>
+            <img src={~p"/images/static_bg.jpeg"} />
+            <p class="title">Title: <%= todo.title %> </p>
+            <p class="body">Body: <%= todo.body %></p>
+            <p class="status">Status: <%= todo.status %> </p>
+            <p class="status">Category: <%= if todo.category != nil, do: todo.category.category_name, else: "Uncategorized" %> </p>
+      
+            <div class="button-container flex space-x-2">
+              <button phx-click="togglelike" phx-value-todo_id={todo.id}>
+                <%= if todo.liked do %>
+                  <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="orange" viewBox="0 0 24 24">
+                    <path d="m12.7 20.7 6.2-7.1c2.7-3 2.6-6.5.8-8.7A5 5 0 0 0 16 3c-1.3 0-2.7.4-4 1.4A6.3 6.3 0 0 0 8 3a5 5 0 0 0-3.7 1.9c-1.8 2.2-2 5.8.8 8.7l6.2 7a1 1 0 0 0 1.4 0Z"/>
+                  </svg>
+                <% else %>
+                  <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6C6.5 1 1 8 5.8 13l6.2 7 6.2-7C23 8 17.5 1 12 6Z"/>
+                  </svg>
+                <% end %>
+              </button>
+      
+              <.link patch={~p"/todos/#{todo}/edit"}>
+                <svg class="w-6 h-6" width="24" height="24" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13.0207 5.82839L15.8491 2.99996L20.7988 7.94971L17.9704 10.7781M13.0207 5.82839L3.41405 15.435C3.22652 15.6225 3.12116 15.8769 3.12116 16.1421V20.6776H7.65669C7.92191 20.6776 8.17626 20.5723 8.3638 20.3847L17.9704 10.7781M13.0207 5.82839L17.9704 10.7781" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </.link>
+      
+              <.link phx-click={JS.push("delete", value: %{id: todo.id}) |> hide("##{id}")}
+                     data-confirm="Are you sure?">
+                <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4V4zm2 2h6V4H9v2zM6.074 8l.857 12H17.07l.857-12H6.074z" fill="#0D0D0D"/>
+                </svg>
+              </.link>
+      
+              <.link navigate={~p"/todos/#{todo}"}>
+                <img class="eye-icon" src={~p"/images/eye-show.png"} width="25px" height="25px" /> + <%= length(todo.subtasks) %>
+              </.link>
+            </div>
+          </div>
+        <% end %>
+      </div>      
+    </div>
   </div>
 
 
-  <form phx-change="sortTodos" >
-    <input type="radio" id="all" name="status" value="all" >
-    <label for="completed">All</label>
-    <input type="radio" id="completed" name="status" value="completed" >
-    <label for="completed">Completed</label>
-    <input type="radio" id="inprogress" name="status" value="in-progress" >
-    <label for="inprogress">In Progress</label>
-    <input type="radio" id="onhold" name="status" value="on-hold">
-    <label for="onhold">On Hold</label>
-  </form>
+
+</div>
+
+
+
+
+
+<br>
+
+
+
+  
+
+
+<div class="bookmark-radio">
+
+  
+
 
 
 </div>
 
 
 
-<div class="card-region" id="card-region" phx-update="stream">
-  <%= for {id, todo} <- @streams.todos do %>
-    <div class="card shadow" id={id}>
-      <img src={~p"/images/static_bg.jpeg"} />
-      <p class="title">Title: <%= todo.title %> </p>
-      <p class="body">Body: <%= todo.body %></p>
-      <p class="status">Status: <%= todo.status %> </p>
-      <p class="status">Category: <%= if todo.category != nil, do: todo.category.category_name, else: "Uncategorized" %> </p>
-
-      <div class="button-container flex space-x-2">
-        <button phx-click="togglelike" phx-value-todo_id={todo.id}>
-          <%= if todo.liked do %>
-            <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="orange" viewBox="0 0 24 24">
-              <path d="m12.7 20.7 6.2-7.1c2.7-3 2.6-6.5.8-8.7A5 5 0 0 0 16 3c-1.3 0-2.7.4-4 1.4A6.3 6.3 0 0 0 8 3a5 5 0 0 0-3.7 1.9c-1.8 2.2-2 5.8.8 8.7l6.2 7a1 1 0 0 0 1.4 0Z"/>
-            </svg>
-          <% else %>
-            <svg class="w-6 h-6 text-gray-800 dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6C6.5 1 1 8 5.8 13l6.2 7 6.2-7C23 8 17.5 1 12 6Z"/>
-            </svg>
-          <% end %>
-        </button>
-
-        <.link patch={~p"/todos/#{todo}/edit"}>
-          <svg class="w-6 h-6" width="24" height="24" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13.0207 5.82839L15.8491 2.99996L20.7988 7.94971L17.9704 10.7781M13.0207 5.82839L3.41405 15.435C3.22652 15.6225 3.12116 15.8769 3.12116 16.1421V20.6776H7.65669C7.92191 20.6776 8.17626 20.5723 8.3638 20.3847L17.9704 10.7781M13.0207 5.82839L17.9704 10.7781" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </.link>
-
-        <.link phx-click={JS.push("delete", value: %{id: todo.id}) |> hide("##{id}")}
-               data-confirm="Are you sure?">
-          <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4V4zm2 2h6V4H9v2zM6.074 8l.857 12H17.07l.857-12H6.074z" fill="#0D0D0D"/>
-          </svg>
-        </.link>
-
-        <.link navigate={~p"/todos/#{todo}"}>
-          <img class="eye-icon" src={~p"/images/eye-show.png"} width="25px" height="25px" /> + <%= length(todo.subtasks) %>
-        </.link>
-      </div>
-    </div>
-  <% end %>
-</div>
 
 
 

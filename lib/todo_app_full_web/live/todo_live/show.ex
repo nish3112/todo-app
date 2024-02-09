@@ -6,7 +6,8 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    updated_socket =  assign(socket, :selected_subtask, %TodoAppFull.Subtasks.Subtask{})
+    {:ok, updated_socket}
   end
 
 
@@ -60,6 +61,24 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     {:noreply, stream(socket, :subtasks, all_subtasks, reset: true)}
 
   end
+
+
+  def handle_event("show_todo", %{"todo-id" => subtask_id}, socket) do
+    IO.inspect(subtask_id)
+    sub_task = TodoAppFull.Subtasks.get_subtask!(subtask_id)
+    {:noreply, assign(socket, :selected_subtask, sub_task)}
+  end
+
+
+  def handle_event("lock", _params, socket) do
+    IO.inspect("LOCKED/UNLOCKED")
+
+   {:noreply,
+    socket |> put_flash(:info, "Todo locked successfully")
+    }
+  end
+
+
 
 
   defp page_title(:show), do: "Show Todo"
