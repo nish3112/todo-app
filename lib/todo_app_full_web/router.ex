@@ -33,6 +33,7 @@ defmodule TodoAppFullWeb.Router do
 
     live "/todos/:id/show/new", TodoLive.Show, :new
     live "/todos/:id/edit/:task_id", TodoLive.Show, :sub_edit
+    live "/todos/:id/permissions", TodoLive.Show, :permissions
 
 
 

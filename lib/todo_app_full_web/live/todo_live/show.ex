@@ -2,12 +2,20 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
   use TodoAppFullWeb, :live_view
 
-  alias TodoAppFull.Todos
 
   @impl true
-  def mount(_params, _session, socket) do
-    updated_socket =  assign(socket, :selected_subtask, %TodoAppFull.Subtasks.Subtask{})
+  def mount(params, session, socket) do
+    %{"id" => id} = params
+
+    current_user = TodoAppFull.Accounts.get_user_by_session_token(session["user_token"])
+    permission = TodoAppFull.Permissions.check_permission(current_user.id, id)
+
+    updated_socket = socket
+                      |> assign(:current_user, current_user)
+                      |> assign(:permission, permission)
+                      |> assign( :selected_subtask, %TodoAppFull.Subtasks.Subtask{})
     {:ok, updated_socket}
+
   end
 
 
@@ -20,26 +28,40 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
 
 
+  # defp apply_action(socket, :show, params) do
+  #   %{"id" => id} = params
+  #   socket
+  #   |> assign(:page_title, page_title(socket.assigns.live_action))
+  #   |> assign(:todo, Todos.get_todo!(id))
+  #   |> stream(:subtasks, Todos.get_todo!(id).subtasks)
+
+
+  # end
   defp apply_action(socket, :show, params) do
     %{"id" => id} = params
-    socket
-    |> assign(:page_title, page_title(socket.assigns.live_action))
-    |> assign(:todo, Todos.get_todo!(id))
-    |> stream(:subtasks, Todos.get_todo!(id).subtasks)
+
+    if socket.assigns.permission == nil do
+      socket
+        |> assign(:permission, "Unauthorized")
+        |> assign(:todo, %TodoAppFull.Todos.Todo{})
+        |> stream(:subtasks, [])
+    else
+      socket
+      |> assign(:page_title, page_title(socket.assigns.live_action))
+      |> assign(:todo, TodoAppFull.Todos.get_todo!(id))
+      |> stream(:subtasks, TodoAppFull.Todos.get_todo!(id).subtasks)
+    end
 
 
   end
 
 
+
   defp apply_action(socket, :new, _params) do
-    # IO.inspect(socket, label: "before")
-    temp = socket
+
+    socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:subtask, %TodoAppFull.Subtasks.Subtask{})
-
-    # IO.inspect(temp, label: "after")
-
-    temp
 
   end
 
@@ -78,6 +100,10 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     }
   end
 
+
+  def handle_event("shareSubtodos", _, socket) do
+    {:noreply, assign(socket, live_action: :permissions)}
+  end
 
 
 
