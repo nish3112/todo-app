@@ -9,6 +9,7 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
     current_user = TodoAppFull.Accounts.get_user_by_session_token(session["user_token"])
     permission = TodoAppFull.Permissions.check_permission(current_user.id, id)
+    # IO.inspect(permission, label: "PERMISSION")
 
     updated_socket = socket
                       |> assign(:current_user, current_user)
@@ -24,9 +25,6 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
-
-
-
 
   # defp apply_action(socket, :show, params) do
   #   %{"id" => id} = params
@@ -72,6 +70,12 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     |> assign(:subtask, TodoAppFull.Subtasks.get_subtask!(task_id))
   end
 
+  defp apply_action(socket, :permissions, params) do
+
+    socket
+    |> assign(:page_title, page_title(socket.assigns.live_action))
+
+  end
 
 
   @impl true
@@ -105,10 +109,32 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     {:noreply, assign(socket, live_action: :permissions)}
   end
 
+  def handle_event("grant_permission", %{"role_id" => role_id, "user_email" => user_email}, socket) do
+
+    user_id = fetch_user_id(user_email)
+
+    IO.inspect(user_id, label: "User ID")
+    IO.inspect(role_id, label: "Role-id")
+    IO.inspect(socket.assigns.todo.id, label: "Todo-id")
+
+    TodoAppFull.Permissions.create_permission(user_id,socket.assigns.todo.id,role_id)
+
+    IO.inspect("OKK")
+
+    {:noreply, socket}
+  end
+
+  defp fetch_user_id(user_email) do
+    user = TodoAppFull.Accounts.get_user_by_email(user_email)
+    user.id
+  end
+
+
 
 
   defp page_title(:show), do: "Show Todo"
   defp page_title(:sub_edit), do: "Edit Todo"
   defp page_title(:new), do: "New Sub Todo"
+  defp page_title(:permissions), do: "Managing permissions"
 
 end

@@ -17,9 +17,11 @@
 </.button>
 
 
-<.button phx-click="shareSubtodos">  
-  Share all subtodos permissions
-</.button>
+<.link patch={~p"/todos/#{@todo.id}/permissions"}>
+  <.button phx-click="shareSubtodos">  
+    Share all subtodos permissions
+  </.button>
+</.link>
 
 <.button phx-click="lock" class="lock">
   Lock
@@ -84,11 +86,11 @@
 
 
 
-<.modal :if={@live_action == :permissions} id="permission-modal" show on_cancel={JS.patch(~p"/todos/#{@todo.id}")}>
+<.modal :if={@live_action in [:permissions]} id="permission-modal" show on_cancel={JS.patch(~p"/todos/#{@todo.id}")}>
   <div>
     <.live_component
       module={TodoAppFullWeb.TodoLive.PermissionFormComponent}
-      id={@todo.id || :new}
+      id={@todo.id}
       permission={@permission}
       title="New Permission Form"
       action={@live_action}

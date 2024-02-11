@@ -40,4 +40,18 @@ defmodule TodoAppFull.Permissions do
       _ -> nil
     end
   end
+
+  def create_permission(user_id, todo_id, role_id) do
+    changeset = Permission.changeset(%Permission{}, %{user_id: user_id, todo_id: todo_id, role_id: role_id})
+
+    case Repo.insert(changeset) do
+      {:ok, permission} -> {:ok, permission}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+
+
+
+
 end

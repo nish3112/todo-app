@@ -1,70 +1,42 @@
 defmodule TodoAppFullWeb.TodoLive.PermissionFormComponent do
   use TodoAppFullWeb, :live_component
+  alias TodoAppFull.Roles
 
   @impl true
   def render(assigns) do
+    roles = Roles.fetch_roles()
+
     ~H"""
     <div>
-      ALLOW PERMISSONS HERE
+      Share todo with:
+      <br>
+      <form phx-submit="grant_permission">
+      <div>
+          <label for="todo-id">Todo ID:</label><br>
+          <input type="text" id="todo-id" name="todo_id" disabled value={@id}<br>
+        </div>
+        <br>
+        <div>
+          <label for="role-id">Role:</label><br>
+          <select id="role-id" name="role_id">
+            <%= for role <- roles do %>
+              <option value={role.id} ><%= role.role %></option>
+            <% end %>
+          </select><br>
+        </div>
+        <br>
+        <div>
+          <label for="user-email">User Email:</label><br>
+          <input type="email" id="user-email" name="user_email"><br>
+        </div>
+        <br>
+        <div>
+          <button type="submit">Grant Permission</button>
+        </div>
+      </form>
     </div>
     """
   end
 
 
-  # @impl true
-  # def update(assigns, socket) do
-  #   changeset = TodoAppFull.Permissions.change_permission(socket.assigns.permission)
-
-  #   {:ok, assign(socket, permissionForm: to_form(changeset))}
-  # end
-
-  # @impl true
-  # def handle_event("validate", %{"permission" => permission_params}, socket) do
-  #   changeset =
-  #     socket.assigns.permission
-  #     |> TodoAppFull.Permissions.change_permission(permission_params)
-  #     |> Map.put(:action, :validate)
-
-  #   {:noreply, assign(socket, permissionForm: to_form(changeset))}
-  # end
-
-  # def handle_event("save", %{"permission" => permission_params}, socket) do
-  #   save_permission(socket, socket.assigns.action, permission_params)
-  # end
-
-  # defp save_permission(socket, :update, permission_params) do
-  #   case TodoAppFull.Permissions.update_permission(socket.assigns.permission, permission_params) do
-  #     {:ok, permission} ->
-  #       notify_parent({:saved, permission})
-
-  #       {:noreply,
-  #        socket
-  #        |> put_flash(:info, "Permission updated successfully")
-  #        |> push_patch(to: socket.assigns.patch)}
-
-  #     {:error, changeset} ->
-  #       {:noreply, assign(socket, permissionForm: to_form(changeset))}
-  #   end
-  # end
-
-  # defp save_permission(socket, :new, permission_params) do
-  #   case TodoAppFull.Permissions.create_permission(permission_params) do
-  #     {:ok, permission} ->
-  #       notify_parent({:saved, permission})
-
-  #       {:noreply,
-  #        socket
-  #        |> put_flash(:info, "Permission created successfully")
-  #        |> push_patch(to: socket.assigns.patch)}
-
-  #     {:error, changeset} ->
-  #       {:noreply, assign(socket, permissionForm: to_form(changeset))}
-  #   end
-  # end
-
-  # defp assign_form(socket, changeset) do
-  #   assign(socket, permissionForm: to_form(changeset))
-  # end
-
-  # defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end
