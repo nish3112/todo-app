@@ -2,9 +2,10 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
   alias TodoAppFull.Roles
   alias TodoAppFull.Permissions
   alias TodoAppFull.Accounts
+  alias TodoAppFull.Todos
   use TodoAppFullWeb, :live_component
 
-  alias TodoAppFull.Todos
+
 
   @impl true
   def render(assigns) do
@@ -67,6 +68,7 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
 
     {:noreply, assign_form(socket, changeset)}
   end
+
 
   def handle_event("save", %{"todo" => todo_params}, socket) do
     current_user_id = Accounts.get_user_by_session_token(socket.assigns.current_user).id

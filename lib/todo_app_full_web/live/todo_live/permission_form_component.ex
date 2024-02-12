@@ -32,7 +32,7 @@ defmodule TodoAppFullWeb.TodoLive.PermissionFormComponent do
         </div>
         <br>
         <div>
-          <button type="submit">Grant Permission</button>
+          <.button type="submit">Grant Permission</.button>
         </div>
       </form>
 
@@ -43,7 +43,9 @@ defmodule TodoAppFullWeb.TodoLive.PermissionFormComponent do
           <%= for permission <- permissions do %>
             <li>
               <%= permission.user.email %>: <%= permission.role.role %>
-              <button phx-click="remove_permission" phx-value-id={permission.id}>Remove</button>
+              <%= if permission.role.role != "Creator" do %>
+                <button phx-click="remove_permission" phx-value-id={permission.id}>Remove</button>
+              <% end %>
             </li>
           <% end %>
         </ul>

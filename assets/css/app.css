@@ -304,6 +304,23 @@ header{
   border-radius: 0 50px 50px 0;
 } */
 
+.sub-todos{
+  width: 50%;
+  background-color: #fff;
+  padding: 20px;
+  flex-grow: 1;
+  resize: horizontal;
+  overflow: auto;
+}
+
+.todos-edit-area {
+  flex-grow: 3;
+  width: 75%;
+  background-color: #fff;
+  padding: 20px;
+  /* border-radius: 0 50px 50px 0; */
+}
+
 
 .selected-todo {
   color: black;
@@ -312,16 +329,13 @@ header{
 }
 
 .selected-todo h2 {
-  font-size: 75px; 
+  font-size: 50px; 
   margin-bottom: 10px; 
 }
 
 .selected-todo p {
-  font-size: 32px; 
+  margin: 1%;
+  font-size: 28px; 
   color: black
-}
-
-.selected-todo strong {
-  font-weight: bold; 
 }
 

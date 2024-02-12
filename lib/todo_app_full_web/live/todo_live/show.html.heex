@@ -8,9 +8,16 @@
 </.header>
 
 
-<.link patch={~p"/todos/#{@todo.id}/show/new"}>
-  <.button >New Sub task</.button>
-</.link>
+
+<%= if @permission == "Unauthorized" do %>
+  <.button disabled> New Sub task - NOT ALLOWED</.button>
+<% else %>
+  <.link patch={~p"/todos/#{@todo.id}/show/new"}>
+    <.button >New Sub task</.button>
+  </.link>
+<% end %>
+
+
 
 <.button phx-click={JS.dispatch("phx:copy", to: "#control-codes")}>  
   Copy link
@@ -39,7 +46,7 @@
 <p>Permission: <%= @permission %> </p>
 
 <div class="main">
-  <div class="filters">
+  <div class="sub-todos">
     <input type="text" id="control-codes" value={@todo.id} style="display: none;"/>
     <div class="card-region" id="card-region" phx-update="stream">
   
@@ -61,7 +68,7 @@
       <% end %>
       </div>
   </div>
-  <div class="todos-area">
+  <div class="todos-edit-area">
       <%= if @selected_subtask do %>
       <div class="selected-todo">
         <h2>Todo Details</h2>
