@@ -9,11 +9,11 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
     current_user = TodoAppFull.Accounts.get_user_by_session_token(session["user_token"])
     permission = TodoAppFull.Permissions.check_permission(current_user.id, id)
-    # IO.inspect(permission, label: "PERMISSION")
+    IO.inspect(permission, label: "PERMISSION")
 
     updated_socket = socket
                       |> assign(:current_user, current_user)
-                      |> assign(:permission, permission)
+                      |> assign(:permission, permission || "Unauthorized")
                       |> assign( :selected_subtask, %TodoAppFull.Subtasks.Subtask{})
     {:ok, updated_socket}
 
@@ -30,17 +30,18 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   #   %{"id" => id} = params
   #   socket
   #   |> assign(:page_title, page_title(socket.assigns.live_action))
-  #   |> assign(:todo, Todos.get_todo!(id))
-  #   |> stream(:subtasks, Todos.get_todo!(id).subtasks)
+  #   |> assign(:todo, TodoAppFull.Todos.get_todo!(id))
+  #   |> stream(:subtasks, TodoAppFull.Todos.get_todo!(id).subtasks)
 
 
   # end
+
   defp apply_action(socket, :show, params) do
     %{"id" => id} = params
 
     if socket.assigns.permission == nil do
       socket
-        |> assign(:permission, "Unauthorized")
+        |> assign(:page_title, page_title(socket.assigns.live_action))
         |> assign(:todo, %TodoAppFull.Todos.Todo{})
         |> stream(:subtasks, [])
     else
@@ -52,6 +53,9 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
 
   end
+
+
+
 
 
 
@@ -70,7 +74,7 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     |> assign(:subtask, TodoAppFull.Subtasks.get_subtask!(task_id))
   end
 
-  defp apply_action(socket, :permissions, params) do
+  defp apply_action(socket, :permissions, _params) do
 
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
@@ -96,15 +100,6 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   end
 
 
-  def handle_event("lock", _params, socket) do
-    IO.inspect("LOCKED/UNLOCKED")
-
-   {:noreply,
-    socket |> put_flash(:info, "Todo locked successfully")
-    }
-  end
-
-
   def handle_event("shareSubtodos", _, socket) do
     {:noreply, assign(socket, live_action: :permissions)}
   end
@@ -124,13 +119,18 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     {:noreply, socket}
   end
 
+
+  def handle_event("remove_permission", %{"id" => permission_id}, socket) do
+    IO.inspect(permission_id, label: "Permission deleted for id : ")
+    TodoAppFull.Permissions.remove_permission(permission_id)
+    IO.inspect("Permission removed")
+    {:noreply, socket}
+  end
+
   defp fetch_user_id(user_email) do
     user = TodoAppFull.Accounts.get_user_by_email(user_email)
     user.id
   end
-
-
-
 
   defp page_title(:show), do: "Show Todo"
   defp page_title(:sub_edit), do: "Edit Todo"

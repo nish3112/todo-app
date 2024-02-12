@@ -72,7 +72,7 @@ defmodule TodoAppFull.Todos do
   """
   def create_todo(attrs \\ %{}) do
     %Todo{}
-    |> Repo.preload(:category)
+    |> Repo.preload([:category, :subtasks])
     |> Todo.changeset(attrs)
     |> Repo.insert()
   end
@@ -93,7 +93,7 @@ defmodule TodoAppFull.Todos do
     dbg(todo)
     dbg(attrs)
     todo
-    |> Repo.preload(:category)
+    |> Repo.preload([:category])
     |> Todo.changeset(attrs)
     |> Repo.update()
   end

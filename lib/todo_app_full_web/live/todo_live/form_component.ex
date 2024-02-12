@@ -1,4 +1,6 @@
 defmodule TodoAppFullWeb.TodoLive.FormComponent do
+  alias TodoAppFull.Roles
+  alias TodoAppFull.Permissions
   alias TodoAppFull.Accounts
   use TodoAppFullWeb, :live_component
 
@@ -87,20 +89,56 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
     end
   end
 
+  # defp save_todo(socket, :new, todo_params) do
+  #   case Todos.create_todo(todo_params) do
+  #     {:ok, todo} ->
+  #       notify_parent({:saved, todo})
+
+  #       {:noreply,
+  #        socket
+  #        |> put_flash(:info, "Todo created successfully")
+  #        |> push_patch(to: socket.assigns.patch)}
+
+  #     {:error, %Ecto.Changeset{} = changeset} ->
+  #       {:noreply, assign_form(socket, changeset)}
+  #   end
+  # end
+
   defp save_todo(socket, :new, todo_params) do
-    case Todos.create_todo(todo_params) do
-      {:ok, todo} ->
-        notify_parent({:saved, todo})
+    current_user_id = Accounts.get_user_by_session_token(socket.assigns.current_user).id
+    roles = Roles.fetch_roles()
 
-        {:noreply,
-         socket
-         |> put_flash(:info, "Todo created successfully")
-         |> push_patch(to: socket.assigns.patch)}
+    case Enum.find(roles, fn role -> role.role == "Creator" end) do
+      nil ->
+        {:noreply, socket |> put_flash(:error, "Some error occuured")}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      creator_role ->
+        IO.inspect(creator_role)
+        case Todos.create_todo(todo_params) do
+          {:ok, todo} ->
+            # Notify parent process
+            notify_parent({:saved, todo})
+
+            # Create a creator permission
+            case Permissions.create_permission(current_user_id, todo.id, creator_role.id) do
+              {:ok, _permission} ->
+                {:noreply,
+                 socket
+                 |> put_flash(:info, "Todo created successfully")
+                 |> push_patch(to: socket.assigns.patch)}
+
+              {:error, _changeset} ->
+                {:noreply, socket |> put_flash(:error, "Failed to create permission")}
+            end
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            {:noreply, assign_form(socket, changeset)}
+        end
     end
   end
+
+
+
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))

@@ -5,6 +5,7 @@ defmodule TodoAppFullWeb.TodoLive.PermissionFormComponent do
   @impl true
   def render(assigns) do
     roles = Roles.fetch_roles()
+    permissions = TodoAppFull.Permissions.list_permissions_for_todo(assigns[:id])
 
     ~H"""
     <div>
@@ -34,6 +35,19 @@ defmodule TodoAppFullWeb.TodoLive.PermissionFormComponent do
           <button type="submit">Grant Permission</button>
         </div>
       </form>
+
+      <div>
+        Users with permission:
+        <br>
+        <ul>
+          <%= for permission <- permissions do %>
+            <li>
+              <%= permission.user.email %>: <%= permission.role.role %>
+              <button phx-click="remove_permission" phx-value-id={permission.id}>Remove</button>
+            </li>
+          <% end %>
+        </ul>
+      </div>
     </div>
     """
   end

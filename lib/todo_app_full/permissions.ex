@@ -51,6 +51,18 @@ defmodule TodoAppFull.Permissions do
   end
 
 
+  def remove_permission(permission_id) do
+    permission = Repo.get!(Permission, permission_id)
+    Repo.delete(permission)
+  end
+
+
+  def list_permissions_for_todo(todo_id) do
+    Repo.all(from p in Permission,
+             where: p.todo_id == ^todo_id,
+             preload: [:user, :role])
+  end
+
 
 
 
