@@ -9,7 +9,7 @@
 
 
 
-<%= if @permission == "Unauthorized" do %>
+<%= if @permission == "Unauthorized" || @permission == "Viewer" do %>
   <.button disabled> New Sub task - NOT ALLOWED</.button>
 <% else %>
   <.link patch={~p"/todos/#{@todo.id}/show/new"}>

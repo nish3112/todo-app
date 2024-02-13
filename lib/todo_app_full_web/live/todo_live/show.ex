@@ -14,6 +14,7 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     updated_socket = socket
                       |> assign(:current_user, current_user)
                       |> assign(:permission, permission || "Unauthorized")
+
                       |> assign( :selected_subtask, %TodoAppFull.Subtasks.Subtask{})
     {:ok, updated_socket}
 
@@ -107,12 +108,10 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   def handle_event("grant_permission", %{"role_id" => role_id, "user_email" => user_email}, socket) do
 
     user_id = fetch_user_id(user_email)
-
     IO.inspect(user_id, label: "User ID")
     IO.inspect(role_id, label: "Role-id")
     IO.inspect(socket.assigns.todo.id, label: "Todo-id")
-
-    TodoAppFull.Permissions.create_permission(user_id,socket.assigns.todo.id,role_id)
+    TodoAppFull.Permissions.create_or_update_permission(user_id,socket.assigns.todo.id,role_id)
 
     IO.inspect("OKK")
 

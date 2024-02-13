@@ -8,12 +8,14 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
+
     categories = Categories.list_categories()
     socket = assign(socket, bookmark: false)
     socket = assign(socket, session_id: session["user_token"])
     socket = assign(socket, page_number: 0)
     socket = assign(socket, categories: categories)
     {:ok, stream(socket, :todos, [])}
+
   end
 
   @impl true
@@ -114,7 +116,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     updated_attrs = %{"liked" => !todo.liked}
     # {:ok, updated_todo} = TodoAppFull.Todos.update_todo(todo, updated_attrs)
 
-    {:ok, updated_todo} = TodoAppFull.Repo.get_by(TodoAppFull.Todos.Todo, id: todo_id) |> TodoAppFull.Repo.preload(:category) |>  TodoAppFull.Todos.update_todo(updated_attrs)
+    {:ok, updated_todo} = TodoAppFull.Repo.get_by(TodoAppFull.Todos.Todo, id: todo_id) |> TodoAppFull.Repo.preload([:category, :subtasks]) |>  TodoAppFull.Todos.update_todo(updated_attrs)
 
 
     {:noreply, stream_insert(socket, :todos, updated_todo)}

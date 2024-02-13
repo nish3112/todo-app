@@ -41,11 +41,30 @@ defmodule TodoAppFull.Permissions do
     end
   end
 
+  def create_or_update_permission(user_id, todo_id, role_id) do
+    case Repo.get_by(Permission, user_id: user_id, todo_id: todo_id) do
+      nil ->
+        create_permission(user_id, todo_id, role_id)
+
+      permission ->
+        update_permission(permission, role_id)
+    end
+  end
+
   def create_permission(user_id, todo_id, role_id) do
     changeset = Permission.changeset(%Permission{}, %{user_id: user_id, todo_id: todo_id, role_id: role_id})
-
+    IO.inspect("Permission created")
     case Repo.insert(changeset) do
       {:ok, permission} -> {:ok, permission}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  def update_permission(permission, role_id) do
+    changeset = Permission.changeset(permission, %{role_id: role_id})
+    IO.inspect("Permission updated")
+    case Repo.update(changeset) do
+      {:ok, updated_permission} -> {:ok, updated_permission}
       {:error, changeset} -> {:error, changeset}
     end
   end

@@ -54,8 +54,8 @@ defmodule TodoAppFull.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:scrivener, "~> 2.7.2"},
       {:scrivener_ecto, "~>2.7.0"},
-      {:flop_phoenix, "~> 0.22.6"}
-    ]
+      {:flop_phoenix, "~> 0.22.6"},
+   ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

@@ -339,3 +339,21 @@ header{
   color: black
 }
 
+
+
+/* Permission modal css */
+.form-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.form {
+  width: 45%; /* Adjust as needed */
+}
+
+.permission-form {
+  width: 45%; /* Adjust as needed */
+}
+
+
+
