@@ -77,6 +77,7 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
   end
 
   defp save_todo(socket, :edit, todo_params) do
+    dbg(todo_params)
     case Todos.update_todo(socket.assigns.todo, todo_params) do
       {:ok, todo} ->
         notify_parent({:saved, todo})

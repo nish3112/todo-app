@@ -59,6 +59,7 @@ end
 
   defp save_todo(socket, :sub_edit, subtask_params) do
       current_subtask = TodoAppFull.Subtasks.get_subtask!(socket.assigns.subtask.id)
+      IO.inspect(subtask_params)
       case TodoAppFull.Subtasks.update_subtask(current_subtask, subtask_params) do
         {:ok, todo} ->
           notify_parent({:saved, todo})

@@ -68,16 +68,62 @@
       <% end %>
       </div>
   </div>
+
+
   <div class="todos-edit-area">
       <%= if @selected_subtask do %>
       <div class="selected-todo">
         <h2>Todo Details</h2>
-        <p><strong>Title:</strong> <%= @selected_subtask.title %></p>
-        <p><strong>Body:</strong> <%= @selected_subtask.body %></p>
-        <p><strong>Status:</strong> <%= @selected_subtask.status %></p>
+        <div id="messages">
+          <!-- the p tag is what sends the subtask id to js - DO NOT REMOVE-->
+          <p id="selected_subtask_id" hidden><strong>Id:</strong> <%= @selected_subtask.id %></p>
+          
+          
+          <%= if @permission == "Editor" || @permission == "Creator" do %>
+            <button class="edit-button" data-subtask-id={@selected_subtask.id}>Edit</button>
+          <% end %>
+          
+          <form id="editForm" phx-submit="save-inline">
+            <!-- The hidden field sends the subtask id to update the whole subtask -- DO NOT REMOVE-->
+            <label for="todo_id" type="hidden"></label>
+            <input id="todo_id" type="hidden" name="todo_id" value={@todo.id}>
+            <label for="selected_subtask_id" type="hidden"></label>
+            <input id="selected_subtask_id" type="hidden" name="selected_subtask_id" value={@selected_subtask.id}>
+            <div>
+              <label for="titleInput">Title:</label>
+              <input  id="titleInput" type="text" name="title" value={@selected_subtask.title} disabled>
+            </div>
+            <div>
+              <label for="statusInput">Status:</label>
+              <select id="statusInput" type="select" name="status" value={@selected_subtask.status} disabled>
+                <option value="on-hold">On-hold</option>
+                <option value="in-progress">In-progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            <div>
+              <label for="bodyInput">Body:</label><br>
+              <textarea id="bodyInput" name="body" disabled>
+                <%= @selected_subtask.body %>
+              </textarea>
+            </div>
+            
+            <%= if @permission == "Editor" || @permission == "Creator" do %>
+              <button type="submit">Save</button>
+            <% end %>
+          </form>
+        </div>
+        
+
       </div>
     <% end %>
   </div>
+
+
+
+
+  
+
 </div>
 
 
@@ -110,18 +156,6 @@
     />
   </div>
 </.modal>
-
-
-
-
-
-
-
-
-
-
-
-
 
 </div>
 

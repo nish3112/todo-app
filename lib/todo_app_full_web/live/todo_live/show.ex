@@ -40,7 +40,7 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   defp apply_action(socket, :show, params) do
     %{"id" => id} = params
 
-    if socket.assigns.permission == nil do
+    if socket.assigns.permission == nil || socket.assigns.permission == "Unauthorized" do
       socket
         |> assign(:page_title, page_title(socket.assigns.live_action))
         |> assign(:todo, %TodoAppFull.Todos.Todo{})
@@ -125,6 +125,34 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     IO.inspect("Permission removed")
     {:noreply, socket}
   end
+
+
+
+  def handle_event("save-inline", todo_params, socket) do
+
+    get_subtask = TodoAppFull.Subtasks.get_subtask!(todo_params["selected_subtask_id"])
+    updated_todo_params = Map.delete(todo_params, "selected_subtask_id")
+
+    case TodoAppFull.Subtasks.update_subtask(get_subtask, updated_todo_params) do
+      {:ok, todo} ->
+        notify_parent({:saved, todo})
+
+        {:noreply,
+         socket
+         |> put_flash(:info, "Todo updated successfully")
+      }
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+          {:noreply, assign_form(socket, changeset)}
+    end
+
+  end
+
+  defp assign_form(socket, %Ecto.Changeset{} = changeset) do
+    assign(socket, :form, to_form(changeset))
+  end
+
+  defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
   defp fetch_user_id(user_email) do
     user = TodoAppFull.Accounts.get_user_by_email(user_email)
