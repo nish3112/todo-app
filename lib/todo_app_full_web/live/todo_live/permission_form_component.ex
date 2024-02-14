@@ -6,6 +6,10 @@ defmodule TodoAppFullWeb.TodoLive.PermissionFormComponent do
   def render(assigns) do
     roles = Roles.fetch_roles()
     permissions = TodoAppFull.Permissions.list_permissions_for_todo(assigns[:id])
+    roles = Enum.filter(roles, fn(role) ->
+      role.role != "Creator"
+    end)
+    IO.inspect(roles)
 
     ~H"""
 

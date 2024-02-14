@@ -57,11 +57,6 @@
           <p class="body">Body: <%= subtask.body %></p>
           <p class="status">Status: <%= subtask.status %> </p>
           <.header>
-          <:actions>
-            <.link patch={~p"/todos/#{@todo.id}/edit/#{subtask.id}"}>
-              <.button phx-value-subtask-id={subtask.id}  >Edit</.button>
-            </.link>
-          </:actions>
             <.button phx-click="delete" phx-value-subtask-id={subtask.id}>Delete</.button>
           </.header>
         </div>
