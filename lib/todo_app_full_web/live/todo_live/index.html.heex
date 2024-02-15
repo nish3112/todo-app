@@ -48,7 +48,7 @@
         
         Sort by status
 
-        <form phx-change="sortTodos" >
+        <form phx-submit="sortTodos" >
           <input type="radio" id="all" name="status" value="all" >
           <label for="completed">All</label> <br>
           <input type="radio" id="completed" name="status" value="completed" >
@@ -57,13 +57,9 @@
           <label for="inprogress">In Progress</label> <br>
           <input type="radio" id="onhold" name="status" value="on-hold">
           <label for="onhold">On Hold</label>
-        </form>    
-      </div>
-
-
-      <div class="category-filter">
-        <label>Category:</label><br/>
-        <form phx-change="sortTodosCategories">
+          <br><br><br>
+          <label>Category:</label><br/>
+  
           <input type="radio" id="gaming" name="category" value="Gaming">
           <label for="gaming">Gaming</label> <br>
           <input type="radio" id="essential" name="category" value="Essential">
@@ -72,6 +68,11 @@
           <label for="study">Study</label> <br>
           <input type="radio" id="coding" name="category" value="Coding">
           <label for="coding">Coding</label>
+
+          <br><br>
+          <.button type="submit"> Search </.button>
+
+
         </form>
         
       </div>

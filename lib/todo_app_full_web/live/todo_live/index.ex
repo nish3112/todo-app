@@ -38,9 +38,6 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   defp apply_action(socket, :new, _params) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
-
-    dbg(todos)
-
     socket
     |> assign(:page_title, "New Todo")
     |> assign(:todo, %Todo{})
@@ -49,9 +46,10 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   defp apply_action(socket, :index, _params) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
-    # IO.inspect(todos)
-    # dbg(todos)
-    sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 6, 6)
+    sorted_todos = todos
+                  |> Enum.sort_by(&(&1.updated_at), Date)
+                  |> Enum.reverse()
+                  |> Enum.slice(socket.assigns.page_number * 8, 8)
     socket
     |> assign(:page_title, "Listing Todos")
     |> stream(:todos, sorted_todos, reset: true)
@@ -63,7 +61,10 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     dbg(socket)
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
 
-    sorted_todos = todos |> Enum.sort_by(&(&1.updated_at), Date) |> Enum.reverse() |> Enum.slice(socket.assigns.page_number * 6, 6)
+    sorted_todos = todos
+                  |> Enum.sort_by(&(&1.updated_at), Date)
+                  |> Enum.reverse()
+                  |> Enum.slice(socket.assigns.page_number * 8, 8)
 
     {:noreply, stream(socket,:todos, sorted_todos, reset: true)}
 
@@ -167,37 +168,47 @@ defmodule TodoAppFullWeb.TodoLive.Index do
       end
     end
 
+
     @impl true
-    def handle_event("sortTodos",%{"_target" => ["status"], "status" => status}, socket) do
-      # dbg(params)
-      todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
-      if status == "all" do
-        pagination_helper(socket)
-      else
-        filtered_todos = Enum.filter(todos, fn todo ->
-          todo.status == status
-        end)
-        {:noreply, stream(socket, :todos, filtered_todos, reset: true)}
-      end
+    def handle_event("sortTodos",%{"status" => status}, socket) do
+      handle_sort_todos(socket, status , nil)
     end
 
 
     @impl true
-    def handle_event("sortTodosCategories",%{"_target" => ["category"], "category" => category}, socket) do
-      # dbg(params)
+    def handle_event("sortTodos",%{"category" => category}, socket) do
+      handle_sort_todos(socket, nil ,category)
+    end
 
+
+    @impl true
+    def handle_event("sortTodos", %{"category" => category, "status" => status}, socket) do
+      handle_sort_todos(socket, status, category)
+    end
+
+
+
+    # Helper functions
+
+    defp handle_sort_todos(socket, status, category) do
       todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
       IO.inspect(todos)
-      if category == "all" do
-        pagination_helper(socket)
-      else
-        filtered_todos = Enum.filter(todos, fn todo ->
-          todo.category.category_name == category
-        end)
-        {:noreply, stream(socket, :todos, filtered_todos, reset: true)}
-      end
+
+      filtered_todos =
+        case {status, category} do
+          {nil, "all"} -> todos
+          {"all", nil} -> todos
+          {nil, category} -> Enum.filter(todos, &(&1.category.category_name == category))
+          {status, nil} -> Enum.filter(todos, &(&1.status == status))
+          {status, category} -> Enum.filter(todos, &(match_filter(&1, status, category)))
+        end
+
+      {:noreply, stream(socket, :todos, filtered_todos, reset: true)}
     end
 
+      defp match_filter(todo, status, category) do
+        todo.status == status && todo.category.category_name == category
+      end
 
 
 

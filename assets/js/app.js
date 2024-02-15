@@ -113,7 +113,7 @@ statusInput.addEventListener("input", event => {
 
 bodyInput.addEventListener("input", event => {
     // Define the delay you want before sending the input value to the server (e.g., 500ms)
-    let debounceDelay = 500
+    let debounceDelay = 100
     // Execute the function after the debounce delay
     debounce(() => {
       let inputValue = event.target.value
