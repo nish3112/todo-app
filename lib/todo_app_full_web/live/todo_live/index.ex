@@ -37,11 +37,9 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   end
 
   defp apply_action(socket, :new, _params) do
-    todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     socket
     |> assign(:page_title, "New Todo")
     |> assign(:todo, %Todo{})
-    |> assign(:max_pg_number, div(length(todos), 5) )
   end
 
   defp apply_action(socket, :index, _params) do
@@ -101,7 +99,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     end)
 
     if String.length(title) == 0 do
-      {:noreply, stream(socket, :todos, todos |> Enum.sort() |> Enum.reverse() |> Enum.slice(0,6) ,reset: true)}
+      {:noreply, stream(socket, :todos, todos |> Enum.sort() |> Enum.reverse() |> Enum.slice(0,8) ,reset: true)}
     else
       {:noreply, stream(socket, :todos, filtered_todos, reset: true)}
     end
@@ -113,11 +111,10 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   def handle_event("togglelike", %{"todo_id" => todo_id}, socket) do
 
     todo = TodoAppFull.Todos.get_todo!(todo_id)
-
     updated_attrs = %{"liked" => !todo.liked}
-    # {:ok, updated_todo} = TodoAppFull.Todos.update_todo(todo, updated_attrs)
-
-    {:ok, updated_todo} = TodoAppFull.Repo.get_by(TodoAppFull.Todos.Todo, id: todo_id) |> TodoAppFull.Repo.preload([:category, :subtasks]) |>  TodoAppFull.Todos.update_todo(updated_attrs)
+    {:ok, updated_todo} = TodoAppFull.Repo.get_by(TodoAppFull.Todos.Todo, id: todo_id)
+                        |> TodoAppFull.Repo.preload([:category, :subtasks])
+                        |>  TodoAppFull.Todos.update_todo(updated_attrs)
 
 
     {:noreply, stream_insert(socket, :todos, updated_todo)}
@@ -147,21 +144,25 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     @impl true
     def handle_event("next", %{"id" => _temp_pg_no}, socket) do
       update_page_num = socket.assigns.page_number + 1
-      updated_socket = assign(socket, page_number: update_page_num)
-      pagination_helper(updated_socket)
 
+      if has_more_todos?(socket, update_page_num) do
+        updated_socket = assign(socket, page_number: update_page_num)
+        pagination_helper(updated_socket)
+      else
+        {:noreply, socket}
+      end
     end
 
     @impl true
     def handle_event("previous", %{"id" => _temp_pg_no}, socket) do
 
       update_page_num = socket.assigns.page_number - 1
+
       if update_page_num < 0 do
         updated_socket = assign(socket, page_number: 0)
         pagination_helper(updated_socket)
         {:noreply, updated_socket}
       else
-
         updated_socket = assign(socket, page_number: update_page_num)
         pagination_helper(updated_socket)
 
@@ -188,7 +189,14 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
 
 
-    # Helper functions
+    # -----------------------------------  Helper functions -------------------------------------------
+
+    defp has_more_todos?(socket, page_number) do
+      todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
+      total_todos_count = length(todos)
+      current_page_start = page_number * 8
+      total_todos_count > current_page_start
+    end
 
     defp handle_sort_todos(socket, status, category) do
       todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos

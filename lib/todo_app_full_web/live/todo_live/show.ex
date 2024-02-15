@@ -27,15 +27,6 @@ defmodule TodoAppFullWeb.TodoLive.Show do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  # defp apply_action(socket, :show, params) do
-  #   %{"id" => id} = params
-  #   socket
-  #   |> assign(:page_title, page_title(socket.assigns.live_action))
-  #   |> assign(:todo, TodoAppFull.Todos.get_todo!(id))
-  #   |> stream(:subtasks, TodoAppFull.Todos.get_todo!(id).subtasks)
-
-
-  # end
 
   defp apply_action(socket, :show, params) do
     %{"id" => id} = params

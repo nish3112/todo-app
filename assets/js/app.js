@@ -58,17 +58,34 @@ let todo_id = todo_id_input.value;
 // let selectedSubtaskId = document.querySelector("#selected_subtask_id").textContent.trim().split(":")[1].trim();
 // console.log(selectedSubtaskId + "HELLO")
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Add event listener to the "Edit" button
-  var editButton = document.querySelector('#messages button');
-  editButton.addEventListener('click', function(event) {
-      // Retrieve the selected subtask ID
-      var selectedSubtaskId = document.querySelector("#selected_subtask_id strong").nextSibling.textContent.trim();
+// document.addEventListener('DOMContentLoaded', function() {
+//   // Add event listener to the "Edit" button
+//   var editButton = document.querySelector('#messages button');
+//   editButton.addEventListener('click', function(event) {
+//       // Retrieve the selected subtask ID
+//       var selectedSubtaskId = document.querySelector("#selected_subtask_id strong").nextSibling.textContent.trim();
 
-      // Call the function to join the room with the selected subtask ID
-      joinRoom(selectedSubtaskId);
-  });
+//       // Call the function to join the room with the selected subtask ID
+//       joinRoom(selectedSubtaskId);
+//   });
+// });
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Add event listener to the card-region element
+  var cardRegion = document.querySelector('.card-region');
+  if (cardRegion) {
+    cardRegion.addEventListener('click', function(event) {
+      // Traverse the DOM hierarchy to find the selected_subtask_id1 element
+      var selectedSubtaskIdElement = document.querySelector('.main .todos-edit-area .selected-todo #messages #selected_subtask_id1');
+      if (selectedSubtaskIdElement) {
+        var subtaskId = selectedSubtaskIdElement.textContent.trim();
+        // Call the function to join the room with the selected subtask ID
+        joinRoom(subtaskId);
+      }
+    });
+  }
 });
+
 
 function joinRoom(subtaskId) {
   console.log('Edit button clicked with subtask ID:', subtaskId);
