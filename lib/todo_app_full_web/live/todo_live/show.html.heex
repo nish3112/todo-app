@@ -71,7 +71,7 @@
         <h2>Todo Details</h2>
         <div id="messages">
           <!-- the p tag is what sends the subtask id to js - DO NOT REMOVE-->
-          <p id="selected_subtask_id1" ><strong>Id:</strong> <%= @selected_subtask.id %></p>
+          <p id="selected_subtask_id1" hidden ><strong>Id:</strong> <%= @selected_subtask.id %></p>
           
           
           <%= if @permission == "Editor" || @permission == "Creator" do %>

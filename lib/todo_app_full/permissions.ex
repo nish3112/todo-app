@@ -49,6 +49,7 @@ defmodule TodoAppFull.Permissions do
       permission ->
         update_permission(permission, role_id)
     end
+    list_permissions_for_todo(todo_id)
   end
 
   def create_permission(user_id, todo_id, role_id) do

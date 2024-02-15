@@ -9,12 +9,12 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
     current_user = TodoAppFull.Accounts.get_user_by_session_token(session["user_token"])
     permission = TodoAppFull.Permissions.check_permission(current_user.id, id)
+
     IO.inspect(permission, label: "PERMISSION")
 
     updated_socket = socket
                       |> assign(:current_user, current_user)
                       |> assign(:permission, permission || "Unauthorized")
-
                       |> assign( :selected_subtask, %TodoAppFull.Subtasks.Subtask{})
     {:ok, updated_socket}
 
@@ -95,28 +95,6 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   def handle_event("shareSubtodos", _, socket) do
     {:noreply, assign(socket, live_action: :permissions)}
   end
-
-  def handle_event("grant_permission", %{"role_id" => role_id, "user_email" => user_email}, socket) do
-
-    user_id = fetch_user_id(user_email)
-    IO.inspect(user_id, label: "User ID")
-    IO.inspect(role_id, label: "Role-id")
-    IO.inspect(socket.assigns.todo.id, label: "Todo-id")
-    TodoAppFull.Permissions.create_or_update_permission(user_id,socket.assigns.todo.id,role_id)
-
-    IO.inspect("OKK")
-
-    {:noreply, socket}
-  end
-
-
-  def handle_event("remove_permission", %{"id" => permission_id}, socket) do
-    IO.inspect(permission_id, label: "Permission deleted for id : ")
-    TodoAppFull.Permissions.remove_permission(permission_id)
-    IO.inspect("Permission removed")
-    {:noreply, socket}
-  end
-
 
 
   def handle_event("save-inline", todo_params, socket) do
