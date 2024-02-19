@@ -30,8 +30,6 @@ end
 
 @impl true
 def update(%{subtask: subtask} = assigns, socket) do
-  # IO.inspect(assigns, label: "Assigns of update")
-  # IO.inspect(subtask)
   changeset = TodoAppFull.Subtasks.change_subtask(subtask)
 
   {:ok,
@@ -57,27 +55,27 @@ end
   end
 
 
-  defp save_todo(socket, :sub_edit, subtask_params) do
-      current_subtask = TodoAppFull.Subtasks.get_subtask!(socket.assigns.subtask.id)
-      IO.inspect(subtask_params)
-      case TodoAppFull.Subtasks.update_subtask(current_subtask, subtask_params) do
-        {:ok, todo} ->
-          notify_parent({:saved, todo})
+  # defp save_todo(socket, :sub_edit, subtask_params) do
+  #     current_subtask = TodoAppFull.Subtasks.get_subtask!(socket.assigns.subtask.id)
+  #     IO.inspect(subtask_params)
+  #     case TodoAppFull.Subtasks.update_subtask(current_subtask, subtask_params) do
+  #       {:ok, todo} ->
+  #         notify_parent({:saved, todo})
 
-          {:noreply,
-           socket
-           |> put_flash(:info, "Subtask created successfully")
-           |> push_patch(to: socket.assigns.patch)}
+  #         {:noreply,
+  #          socket
+  #          |> put_flash(:info, "Subtask created successfully")
+  #          |> push_patch(to: socket.assigns.patch)}
 
-        {:error, %Ecto.Changeset{} = changeset} ->
-          {:noreply, assign_form(socket, changeset)}
-      end
-  end
+  #       {:error, %Ecto.Changeset{} = changeset} ->
+  #         {:noreply, assign_form(socket, changeset)}
+  #     end
+  # end
 
   defp save_todo(socket, :new, subtask_params) do
     case TodoAppFull.Subtasks.create_subtask(subtask_params) do
       {:ok, todo} ->
-        notify_parent({:saved, todo})
+        Phoenix.PubSub.broadcast(TodoAppFull.PubSub, socket.assigns.id, {:saved,todo})
 
         {:noreply,
          socket
