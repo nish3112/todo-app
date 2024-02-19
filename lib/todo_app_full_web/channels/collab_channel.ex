@@ -2,19 +2,8 @@ defmodule TodoAppFullWeb.CollabChannel do
   use TodoAppFullWeb, :channel
 
   @impl true
-  # def join("room:lobby", _message, socket) do
-  #   {:ok, socket}
-  # end
-
-  # @impl true
-  # def join("room:", _message, socket) do
-  #   {:ok, socket}
-  # end
-
-
 
   def join("room:42", _params, socket) do
-    # Your logic here
     {:ok, socket}
   end
 

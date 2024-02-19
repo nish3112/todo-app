@@ -4,7 +4,7 @@
 
 
 
-<div class="index-page" phx-link="/Users/nishiththakker/Desktop/Projects/todo-app/priv/static/assets/css/todos.css">
+<div class="index-page">
 
   <div class="search-bar">
     <form phx-change="search" id="search" >
@@ -126,48 +126,18 @@
     </div>
   </div>
 
-
-
 </div>
 
 
-
-
-
+<br><br><br><br>
+<div class="pagination">
+  <.button phx-click="previous" phx-value-id={@page_number}>Previous</.button>
+  &nbsp;&nbsp;
+  <%= @page_number + 1 %>
+  &nbsp;&nbsp;
+ <.button phx-click="next" phx-value-id={@page_number}>Next</.button> 
+</div>
 <br>
-
-
-
-  
-
-
-<div class="bookmark-radio">
-
-  
-
-
-
-</div>
-
-
-
-
-
-
-  
-
-  <div class="pagination">
-   <.button phx-click="previous" phx-value-id={@page_number}>Previous</.button>
-   &nbsp;&nbsp;
-   <%= @page_number + 1 %>
-   &nbsp;&nbsp;
-  <.button phx-click="next" phx-value-id={@page_number}>Next</.button> 
-</div>
-
-
-
-
-
 
   <.modal :if={@live_action in [:new, :edit]} id="todo-modal" show on_cancel={JS.patch(~p"/todos")}>
     <.live_component
