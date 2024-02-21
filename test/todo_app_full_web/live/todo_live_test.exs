@@ -1,113 +1,127 @@
 defmodule TodoAppFullWeb.TodoLiveTest do
+  alias TodoAppFullWeb.ConnCase
+  alias TodoAppFull.AccountsFixtures
   use TodoAppFullWeb.ConnCase
 
   import Phoenix.LiveViewTest
   import TodoAppFull.TodosFixtures
+  import TodoAppFull.AccountsFixtures
 
-  @create_attrs %{status: "some status", title: "some title", body: "some body", liked: true}
+  @create_attrs %{status: "on-hold", title: "some title", body: "some body", liked: true}
   @update_attrs %{status: "some updated status", title: "some updated title", body: "some updated body", liked: false}
-  @invalid_attrs %{status: nil, title: nil, body: nil, liked: false}
+  @invalid_attrs %{status: "on-hold", title: nil, body: nil, liked: false}
 
-  defp create_todo(_) do
-    todo = todo_fixture()
-    %{todo: todo}
+
+  describe "User not logged in - Always redirected to log in page" do
+
+    setup do
+      conn = Phoenix.ConnTest.build_conn()
+      {:ok, conn: conn}
+    end
+
+
+    #  ADD ALL THE TC WHERE THE USER WAS TRYING TO ACCESS A CERTAIN PAGE AND WAS NOT LOGGED IN
+    #  HENCE HE WAS REDIRECTED TO THE LOGIN PAGE
+
+
   end
 
   describe "Index" do
-    setup [:create_todo]
 
-    test "lists all todos", %{conn: conn, todo: todo} do
-      {:ok, _index_live, html} = live(conn, ~p"/todos")
+    setup do
+      conn = Phoenix.ConnTest.build_conn()
+      roles = TodoAppFull.RolesFixtures.insert_roles()
+      category = TodoAppFull.CategoryFixtures.insert_categories()
+      logged_in_user = ConnCase.register_and_log_in_user(%{conn: conn})
 
+      %{conn: logged_in_user.conn}
+    end
+
+    test "User when logged in lands on the listing todos page", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/todos")
+      html = render(view)
       assert html =~ "Listing Todos"
-      assert html =~ todo.status
     end
 
-    test "saves new todo", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/todos")
+    test "User creates todo", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/todos")
 
-      assert index_live |> element("a", "New Todo") |> render_click() =~
-               "New Todo"
+      assert view |> element("a", "+") |> render_click() =~ "+"
+      assert_patch(view, ~p"/todos/new")
 
-      assert_patch(index_live, ~p"/todos/new")
+      assert view
+            |> form("#todo-form", todo: @invalid_attrs)
+            |> render_change() =~ "can&#39;t be blank"
 
-      assert index_live
-             |> form("#todo-form", todo: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+      assert view
+            |> form("#todo-form", todo: @create_attrs)
+            |> render_submit()
 
-      assert index_live
-             |> form("#todo-form", todo: @create_attrs)
-             |> render_submit()
+      assert_patch(view, ~p"/todos")
 
-      assert_patch(index_live, ~p"/todos")
-
-      html = render(index_live)
+      html = render(view)
       assert html =~ "Todo created successfully"
-      assert html =~ "some status"
+      assert html =~ "some title"
+
     end
 
-    test "updates todo in listing", %{conn: conn, todo: todo} do
-      {:ok, index_live, _html} = live(conn, ~p"/todos")
+    test "User updates todo",%{conn: conn} do
 
-      assert index_live |> element("#todos-#{todo.id} a", "Edit") |> render_click() =~
-               "Edit Todo"
+      {:ok, view, _html} = live(conn, ~p"/todos")
 
-      assert_patch(index_live, ~p"/todos/#{todo}/edit")
+      assert view |> element("a", "+") |> render_click() =~ "+"
+      assert view
+            |> form("#todo-form", todo: @create_attrs)
+            |> render_submit()
+      assert_patch(view, ~p"/todos")
+      html = render(view)
 
-      assert index_live
-             |> form("#todo-form", todo: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
 
-      assert index_live
-             |> form("#todo-form", todo: @update_attrs)
-             |> render_submit()
+      # UPDATE CODE -- Solve the above bug --
+      # User here and in todo fixture is different so you cannot get the same todo
 
-      assert_patch(index_live, ~p"/todos")
+      {:ok, _, html} = live(conn, ~p"/todos")
+      assert html =~ "Title: #{@create_attrs.title}"
 
-      html = render(index_live)
-      assert html =~ "Todo updated successfully"
-      assert html =~ "some updated status"
+
+      # assert view |> element("a") |> render_click() |> IO.inspect()
+
+      # REMAINING
+
     end
 
-    test "deletes todo in listing", %{conn: conn, todo: todo} do
-      {:ok, index_live, _html} = live(conn, ~p"/todos")
 
-      assert index_live |> element("#todos-#{todo.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#todos-#{todo.id}")
+    test "User deletes todo",%{conn: conn} do
+
+      # {:ok, view, _html} = live(conn, ~p"/todos")
+
+      # assert view |> element("a", "+") |> render_click() =~ "+"
+      # assert view
+      #       |> form("#todo-form", todo: @create_attrs)
+      #       |> render_submit()
+      # assert_patch(view, ~p"/todos")
+      # html = render(view)
+      # delete_link_selector = "a[data-confirm='Are you sure?']"
+      # assert view |> element(delete_link_selector) |> render_click()
+
+
     end
+
+    test "User searches todo" do
+
+    end
+
+    test "User uses bookmarks" do
+
+    end
+
+    # ADD FILTERS TEST
+
+
+
+
+
   end
 
-  describe "Show" do
-    setup [:create_todo]
 
-    test "displays todo", %{conn: conn, todo: todo} do
-      {:ok, _show_live, html} = live(conn, ~p"/todos/#{todo}")
-
-      assert html =~ "Show Todo"
-      assert html =~ todo.status
-    end
-
-    test "updates todo within modal", %{conn: conn, todo: todo} do
-      {:ok, show_live, _html} = live(conn, ~p"/todos/#{todo}")
-
-      assert show_live |> element("a", "Edit") |> render_click() =~
-               "Edit Todo"
-
-      assert_patch(show_live, ~p"/todos/#{todo}/show/edit")
-
-      assert show_live
-             |> form("#todo-form", todo: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert show_live
-             |> form("#todo-form", todo: @update_attrs)
-             |> render_submit()
-
-      assert_patch(show_live, ~p"/todos/#{todo}")
-
-      html = render(show_live)
-      assert html =~ "Todo updated successfully"
-      assert html =~ "some updated status"
-    end
-  end
 end

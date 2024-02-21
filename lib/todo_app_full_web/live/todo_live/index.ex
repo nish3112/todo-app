@@ -6,6 +6,8 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   use TodoAppFullWeb, :live_view
 
 
+  on_mount {TodoAppFullWeb.UserAuth, :mount_current_user}
+
   @impl true
   def mount(_params, session, socket) do
 

@@ -12,7 +12,7 @@ defmodule TodoAppFull.Categories.Category do
   @doc false
   def changeset(todo, attrs) do
     todo
-    |> cast(attrs, [:title, :body, :status, :liked, :user_id, :category_id])
-    |> validate_required([:title, :body, :status, :liked, :user_id, :category_id])
+    |> cast(attrs, [:category_name])
+    |> validate_required([:category_name])
   end
 end

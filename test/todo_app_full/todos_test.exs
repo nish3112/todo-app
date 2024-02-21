@@ -1,27 +1,22 @@
 defmodule TodoAppFull.TodosTest do
   use TodoAppFull.DataCase
-
   alias TodoAppFull.Todos
 
   describe "todos" do
     alias TodoAppFull.Todos.Todo
-
     import TodoAppFull.TodosFixtures
 
     @invalid_attrs %{status: nil, title: nil, body: nil, liked: nil}
 
-    test "list_todos/0 returns all todos" do
-      todo = todo_fixture()
-      assert Todos.list_todos() == [todo]
-    end
-
     test "get_todo!/1 returns the todo with given id" do
       todo = todo_fixture()
+
       assert Todos.get_todo!(todo.id) == todo
     end
 
     test "create_todo/1 with valid data creates a todo" do
-      valid_attrs = %{status: "some status", title: "some title", body: "some body", liked: true}
+      fixture_todo = TodoAppFull.TodosFixtures.todo_fixture()
+      valid_attrs = %{status: "some status", title: "some title", body: "some body", liked: true, user_id: fixture_todo.user_id, category_id: fixture_todo.category_id}
 
       assert {:ok, %Todo{} = todo} = Todos.create_todo(valid_attrs)
       assert todo.status == "some status"

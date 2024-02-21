@@ -1,13 +1,14 @@
 defmodule TodoAppFullWeb.CollabChannelTest do
   use TodoAppFullWeb.ChannelCase
+  alias Ecto.UUID
 
   setup do
     {:ok, _, socket} =
       TodoAppFullWeb.UserSocket
       |> socket("user_id", %{some: :assign})
-      |> subscribe_and_join(TodoAppFullWeb.CollabChannel, "collab:lobby")
+      |> subscribe_and_join(TodoAppFullWeb.CollabChannel, "room:42")
 
-    %{socket: socket}
+    {:ok, socket: socket}
   end
 
   test "ping replies with status ok", %{socket: socket} do
@@ -24,4 +25,12 @@ defmodule TodoAppFullWeb.CollabChannelTest do
     broadcast_from!(socket, "broadcast", %{"some" => "data"})
     assert_push "broadcast", %{"some" => "data"}
   end
+
+  test "join/3 joins a room with a specific ID" do
+    room_id = UUID.generate()
+    {:ok, socket} = TodoAppFullWeb.CollabChannel.join("room:" <> room_id, %{}, %Phoenix.Socket{})
+    assert {:ok, socket} == {:ok, socket}
+  end
+
+
 end

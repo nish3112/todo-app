@@ -20,7 +20,6 @@ defmodule TodoAppFull.Todos do
 
   """
   def list_todos(u_id) do
-    IO.inspect(u_id)
     Todo
         |> where([t], (t.user_id == ^u_id))
         |> Repo.preload([:category, :subtasks])
@@ -51,11 +50,10 @@ defmodule TodoAppFull.Todos do
 
   """
   def get_todo!(id) do
-    todo = Todo
+    Todo
     |> Repo.get!(id)
     |> Repo.preload([:category, :subtasks])
-    dbg(todo)
-    todo
+
   end
 
   @doc """
@@ -90,8 +88,6 @@ defmodule TodoAppFull.Todos do
 
   """
   def update_todo(%Todo{} = todo, attrs) do
-    dbg(todo)
-    dbg(attrs)
     todo
     |> Repo.preload([:category, :subtasks])
     |> Todo.changeset(attrs)
