@@ -1,11 +1,9 @@
 defmodule TodoAppFullWeb.TodoLive.Show do
-  alias TodoAppFullWeb.TodoLive.SubtaskFormComponent
   use TodoAppFullWeb, :live_view
 
 
   @impl true
   def mount(params, session, socket) do
-    # YAHA you can join the @todo broadcast
     %{"id" => id} = params
 
 
@@ -88,7 +86,6 @@ end
 
   @impl true
   def handle_event("delete", %{"subtask-id" => subtask_id}, socket) do
-    #  Broadcast what you deleted
     subtask = TodoAppFull.Subtasks.get_subtask!(subtask_id)
     TodoAppFull.Subtasks.delete_subtask(subtask)
     Phoenix.PubSub.broadcast(TodoAppFull.PubSub, socket.assigns.id,{:delete_subtask, subtask})
@@ -131,7 +128,7 @@ end
     assign(socket, :form, to_form(changeset))
   end
 
-  defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
+
   defp page_title(:show), do: "Show Todo"
   defp page_title(:sub_edit), do: "Edit Todo"
   defp page_title(:new), do: "New Sub Todo"

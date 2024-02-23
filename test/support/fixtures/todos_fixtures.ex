@@ -28,4 +28,24 @@ defmodule TodoAppFull.TodosFixtures do
     TodoAppFull.Todos.get_todo!(todo.id)
   end
 
+
+  def todo_fixture_with_details(attrs) do
+
+    {:ok, todo} =
+      attrs
+      |> Enum.into(%{
+        body: attrs.body,
+        liked: attrs.liked,
+        status: attrs.status,
+        title: attrs.title,
+        user_id: attrs.user_id,
+        category_id: attrs.category_id
+      })
+      |> TodoAppFull.Todos.create_todo()
+
+
+    # todo
+    TodoAppFull.Todos.get_todo!(todo.id)
+  end
+
 end

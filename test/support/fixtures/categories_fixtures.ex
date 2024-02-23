@@ -4,15 +4,17 @@ defmodule TodoAppFull.CategoryFixtures do
 
   def insert_categories do
     categories = [
-      %{category_name: "Work"},
-      %{category_name: "Personal"},
-      %{category_name: "Shopping"}
-      # Add more categories as needed
+      %{category_name: "Gaming"},
+      %{category_name: "Essential"},
+      %{category_name: "Coding"}
     ]
 
     Repo.transaction(fn ->
       Enum.each(categories, &Categories.create_category/1)
     end)
+
+    Categories.list_categories()
+
   end
 
 end

@@ -5,8 +5,6 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
   alias TodoAppFull.Todos
   use TodoAppFullWeb, :live_component
 
-
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -120,9 +118,6 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
         end
     end
   end
-
-
-
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))

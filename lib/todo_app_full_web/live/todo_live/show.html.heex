@@ -51,7 +51,7 @@
     <div class="card-region" id="card-region" phx-update="stream">
   
       <%= for {id,subtask} <- @streams.subtasks do %>
-        <div class="card shadow" phx-click="show_todo" phx-value-todo-id={subtask.id} id={id}>
+        <div class="card " phx-click="show_todo" phx-value-todo-id={subtask.id} id={id}>
           <img src={~p"/images/static_bg.jpeg"} />
           <p class="title">Title: <%= subtask.title %> </p>
           <p class="body">Body: <%= subtask.body %></p>

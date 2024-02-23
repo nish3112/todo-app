@@ -6,8 +6,6 @@ defmodule TodoAppFullWeb.TodoLive.SubtaskFormComponent do
 def render(assigns) do
   ~H"""
   <div>
-
-
     <.simple_form
       for={@subtaskForm}
       id="subtask-form"
@@ -54,24 +52,6 @@ end
     save_todo(socket, socket.assigns.action, new_subtask_params)
   end
 
-
-  # defp save_todo(socket, :sub_edit, subtask_params) do
-  #     current_subtask = TodoAppFull.Subtasks.get_subtask!(socket.assigns.subtask.id)
-  #     IO.inspect(subtask_params)
-  #     case TodoAppFull.Subtasks.update_subtask(current_subtask, subtask_params) do
-  #       {:ok, todo} ->
-  #         notify_parent({:saved, todo})
-
-  #         {:noreply,
-  #          socket
-  #          |> put_flash(:info, "Subtask created successfully")
-  #          |> push_patch(to: socket.assigns.patch)}
-
-  #       {:error, %Ecto.Changeset{} = changeset} ->
-  #         {:noreply, assign_form(socket, changeset)}
-  #     end
-  # end
-
   defp save_todo(socket, :new, subtask_params) do
     case TodoAppFull.Subtasks.create_subtask(subtask_params) do
       {:ok, todo} ->
@@ -93,7 +73,5 @@ defp assign_form(socket, %Ecto.Changeset{} = changeset) do
   assign(socket, :subtaskForm, to_form(changeset))
 end
 
-
-defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
 end

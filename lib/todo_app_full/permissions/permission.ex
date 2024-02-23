@@ -6,7 +6,6 @@ defmodule TodoAppFull.Permissions.Permission do
   @foreign_key_type :binary_id
 
   schema "permissions" do
-    # field :role_id, :binary_id
     belongs_to :role, TodoAppFull.Roles.Role
     belongs_to :todo, TodoAppFull.Todos.Todo
     belongs_to :user, TodoAppFull.Accounts.User

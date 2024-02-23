@@ -12,5 +12,7 @@ defmodule TodoAppFull.RolesFixtures do
     Repo.transaction(fn ->
       Enum.each(roles, &Roles.create_role/1)
     end)
+
+    Roles.fetch_roles()
   end
 end

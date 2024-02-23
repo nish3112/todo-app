@@ -12,10 +12,11 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   def mount(_params, session, socket) do
 
     categories = Categories.list_categories()
-    socket = assign(socket, bookmark: false)
-    socket = assign(socket, session_id: session["user_token"])
-    socket = assign(socket, page_number: 0)
-    socket = assign(socket, categories: categories)
+    socket =  socket
+              |> assign(bookmark: false)
+              |> assign(session_id: session["user_token"])
+              |> assign(page_number: 0)
+              |> assign(categories: categories)
     {:ok, stream(socket, :todos, [])}
 
   end
@@ -75,8 +76,6 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     {:noreply, stream_delete(socket, :todos, todo)}
   end
 
-
-  @impl true
   def handle_event("search", %{"title" => title}, socket) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     filtered_todos = Enum.filter(todos, fn todo ->
@@ -90,20 +89,16 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     end
   end
 
-
-  @impl true
   def handle_event("togglelike", %{"todo_id" => todo_id}, socket) do
     todo = TodoAppFull.Todos.get_todo!(todo_id)
     updated_attrs = %{"liked" => !todo.liked}
     {:ok, updated_todo} = TodoAppFull.Repo.get_by(TodoAppFull.Todos.Todo, id: todo_id)
-                        |> TodoAppFull.Repo.preload([:category, :subtasks])
-                        |>  TodoAppFull.Todos.update_todo(updated_attrs)
+                      |>  TodoAppFull.Repo.preload([:category, :subtasks])
+                      |>  TodoAppFull.Todos.update_todo(updated_attrs)
 
     {:noreply, stream_insert(socket, :todos, updated_todo)}
   end
 
-
-  @impl true
   def handle_event("bookmark", _params, socket) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     is_bookmark = socket.assigns[:bookmark]
@@ -115,14 +110,11 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     else
       socket = assign(socket, bookmark: !is_bookmark)
       socket = assign(socket, page_number: 0)
-      {:noreply, stream(socket, :todos, todos |> Enum.sort() |> Enum.reverse() |> Enum.slice(0,6) ,reset: true)}
+      {:noreply, stream(socket, :todos, todos |> Enum.sort() |> Enum.reverse() |> Enum.slice(0,8) ,reset: true)}
 
     end
   end
 
-
-
-  @impl true
   def handle_event("next", %{"id" => _temp_pg_no}, socket) do
     update_page_num = socket.assigns.page_number + 1
 
@@ -135,7 +127,6 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   end
 
 
-  @impl true
   def handle_event("previous", %{"id" => _temp_pg_no}, socket) do
     update_page_num = socket.assigns.page_number - 1
     if update_page_num < 0 do
@@ -148,20 +139,14 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     end
   end
 
-
-  @impl true
   def handle_event("sortTodos",%{"status" => status}, socket) do
     handle_sort_todos(socket, status , nil)
   end
 
-
-  @impl true
   def handle_event("sortTodos",%{"category" => category}, socket) do
     handle_sort_todos(socket, nil ,category)
   end
 
-
-  @impl true
   def handle_event("sortTodos", %{"category" => category, "status" => status}, socket) do
     handle_sort_todos(socket, status, category)
   end
@@ -177,10 +162,8 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     total_todos_count > current_page_start
   end
 
-
   defp handle_sort_todos(socket, status, category) do
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
-    IO.inspect(todos)
 
     filtered_todos =
       case {status, category} do

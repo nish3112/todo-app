@@ -9,7 +9,9 @@ defmodule TodoAppFull.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      source_url: "https://github.com/nish3112/todo-app",
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -55,6 +57,8 @@ defmodule TodoAppFull.MixProject do
       {:scrivener, "~> 2.7.2"},
       {:scrivener_ecto, "~>2.7.0"},
       {:flop_phoenix, "~> 0.22.6"},
+      {:excoveralls, "~> 0.18.0"},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
    ]
   end
 

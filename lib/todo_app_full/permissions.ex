@@ -83,7 +83,4 @@ defmodule TodoAppFull.Permissions do
              preload: [:user, :role])
   end
 
-
-
-
 end

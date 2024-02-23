@@ -1,4 +1,5 @@
 defmodule TodoAppFull.Categories.Category do
+
   use Ecto.Schema
   import Ecto.Changeset
 
