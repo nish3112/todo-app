@@ -5,6 +5,11 @@ defmodule TodoAppFull.Todos.Todo do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
+
+  @moduledoc """
+  This module defines the schema for todos in the TodoAppFull application.
+  """
+
   schema "todos" do
     field :status, :string
     field :title, :string

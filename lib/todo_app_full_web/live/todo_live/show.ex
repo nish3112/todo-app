@@ -1,16 +1,25 @@
 defmodule TodoAppFullWeb.TodoLive.Show do
   use TodoAppFullWeb, :live_view
+  require Logger
+
+  @moduledoc """
+  This module `TodoAppFullWeb.TodoLive.Show` manages the LiveView component responsible for displaying and managing todos and subtodos within the TodoAppFull application.
+
+  ## Responsibilities
+
+  - Mounting: Handles the initial setup and subscription to the appropriate PubSub channel.
+  - Handling Params: Manages parameters passed to the LiveView component.
+  - Handling Events: Responds to user-triggered events such as subtask deletion, subtask updates, and permission management.
+  - Logging: Utilizes the Logger module to log important events and actions performed by users.
+
+  """
 
 
   @impl true
   def mount(params, session, socket) do
     %{"id" => id} = params
-
-
     Phoenix.PubSub.subscribe(TodoAppFull.PubSub, id)
-    IO.inspect("Joined pubsub : " <> id)
-
-
+    Logger.info("User joined the default room")
     current_user = TodoAppFull.Accounts.get_user_by_session_token(session["user_token"])
     permission = TodoAppFull.Permissions.check_permission(current_user.id, id)
     updated_socket = socket
@@ -20,24 +29,31 @@ defmodule TodoAppFullWeb.TodoLive.Show do
                       |> assign( :selected_subtask, %TodoAppFull.Subtasks.Subtask{})
 
     {:ok, updated_socket}
-
   end
 
 
   @impl true
+  @spec handle_info(
+          {:delete_subtask, any()} | {:saved, any()} | {:update_subtask, any()},
+          Phoenix.LiveView.Socket.t()
+        ) :: {:noreply, map()}
+
+  # Handles the deletion of a subtask and updates the LiveView.
   def handle_info({:delete_subtask, subtask}, socket) do
     {:noreply, socket |> stream_delete(:subtasks, subtask)}
 
   end
 
+  # Handles the update of a subtask and updates the LiveView.
   def handle_info({:update_subtask, subtask}, socket) do
     {:noreply, socket |> stream_insert(:subtasks, subtask)}
 
   end
 
-def handle_info({:saved, todo}, socket) do
-    {:noreply, socket |> stream_insert(:subtasks, todo)}
-end
+  # Handles the saving of a todo and updates the LiveView.
+  def handle_info({:saved, todo}, socket) do
+      {:noreply, socket |> stream_insert(:subtasks, todo)}
+  end
 
 
 
@@ -46,16 +62,17 @@ end
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-
+  # Handles the action for showing a todo, either granting or denying access based on permissions.
   defp apply_action(socket, :show, params) do
     %{"id" => id} = params
-
     if socket.assigns.permission == nil || socket.assigns.permission == "Unauthorized" do
+      Logger.warning("User opened the todo: #{id} and was denied access")
       socket
         |> assign(:page_title, page_title(socket.assigns.live_action))
         |> assign(:todo, %TodoAppFull.Todos.Todo{})
         |> stream(:subtasks, [])
     else
+      Logger.info("User opened the todo: #{id} and was granted access")
       socket
       |> assign(:page_title, page_title(socket.assigns.live_action))
       |> assign(:todo, TodoAppFull.Todos.get_todo!(id))
@@ -63,29 +80,64 @@ end
     end
   end
 
-
+  # Handles the action for opening a new subtask modal.
   defp apply_action(socket, :new, _params) do
+    Logger.info("User opened new subtask modal")
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:subtask, %TodoAppFull.Subtasks.Subtask{})
   end
 
+  # Handles the action for opening an edit subtask modal.
   defp apply_action(socket, :sub_edit, params) do
     %{"task_id" => task_id} = params
+    Logger.info("User opened edit subtask modal (subtask id: #{task_id}) ")
+
       #  You are not using this function for edit 90% --> Confirm this
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:subtask, TodoAppFull.Subtasks.get_subtask!(task_id))
   end
 
+  # Handles the action for opening an edit permissions modal.
   defp apply_action(socket, :permissions, _params) do
+    Logger.info("User opened edit permissions modal ")
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
   end
 
 
   @impl true
+  @doc """
+  Handles various events triggered by the user.
+
+  - For the 'delete' event:
+      * Deletes the specified subtask.
+      * Broadcasts the deletion event to subscribers.
+      * Retrieves all subtasks associated with the todo.
+      * Streams the updated list of subtasks to the client.
+
+  - For the 'show_todo' event:
+      * Retrieves the selected subtask by its ID.
+      * Assigns the selected subtask to the socket.
+
+  - For the 'shareSubtodos' event:
+      * Assigns the live action to 'permissions', indicating the user's intent to manage permissions.
+
+  - For the 'save-inline' event:
+      * Retrieves the specified subtask by its ID.
+      * Updates the subtask with the provided parameters.
+      * Broadcasts the update event if successful, or assigns the appropriate changeset errors.
+
+  @param event The name of the event triggered by the user.
+  @param params Additional parameters passed with the event.
+  @param socket The current socket.
+
+  @return A tuple indicating the action to take and the updated socket.
+  """
+
   def handle_event("delete", %{"subtask-id" => subtask_id}, socket) do
+    Logger.info("User deleted the subtask id: #{subtask_id}")
     subtask = TodoAppFull.Subtasks.get_subtask!(subtask_id)
     TodoAppFull.Subtasks.delete_subtask(subtask)
     Phoenix.PubSub.broadcast(TodoAppFull.PubSub, socket.assigns.id,{:delete_subtask, subtask})
@@ -95,7 +147,7 @@ end
 
 
   def handle_event("show_todo", %{"todo-id" => subtask_id}, socket) do
-    IO.inspect(subtask_id)
+    Logger.info("User clicked on the subtask id: #{subtask_id}")
     sub_task = TodoAppFull.Subtasks.get_subtask!(subtask_id)
     {:noreply, assign(socket, :selected_subtask, sub_task)}
   end
@@ -107,6 +159,7 @@ end
 
 
   def handle_event("save-inline", todo_params, socket) do
+    Logger.info("User saved the subtask id: #{todo_params["selected_subtask_id"]}")
     get_subtask = TodoAppFull.Subtasks.get_subtask!(todo_params["selected_subtask_id"])
     updated_todo_params = Map.delete(todo_params, "selected_subtask_id")
     case TodoAppFull.Subtasks.update_subtask(get_subtask, updated_todo_params) do

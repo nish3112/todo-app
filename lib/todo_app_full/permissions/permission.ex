@@ -5,6 +5,10 @@ defmodule TodoAppFull.Permissions.Permission do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @moduledoc """
+  This module defines the schema for permissions.
+  """
+
   schema "permissions" do
     belongs_to :role, TodoAppFull.Roles.Role
     belongs_to :todo, TodoAppFull.Todos.Todo

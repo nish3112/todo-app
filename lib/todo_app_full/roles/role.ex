@@ -5,6 +5,10 @@ defmodule TodoAppFull.Roles.Role do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @moduledoc """
+  This module defines the schema for roles.
+  """
+
   schema "roles" do
     field :role, :string
   end

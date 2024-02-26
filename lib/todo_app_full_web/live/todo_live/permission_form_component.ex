@@ -1,6 +1,20 @@
 defmodule TodoAppFullWeb.TodoLive.PermissionFormComponent do
+  require Logger
   use TodoAppFullWeb, :live_component
   alias TodoAppFull.Roles
+
+  @moduledoc """
+  This module `TodoAppFullWeb.TodoLive.PermissionFormComponent` governs the LiveView component responsible for managing permissions related to todo items within the TodoAppFull application.
+
+  ## Responsibilities
+
+  - Render Permissions Form: Generates the HTML form allowing users to grant permissions to other users based on roles.
+  - Update Permissions: Fetches and updates permissions associated with a specific todo item.
+  - Handle Permission Events: Manages events triggered by user actions such as granting or removing permissions.
+  - User Interaction: Facilitates user interaction by providing forms and displaying permission details dynamically.
+  - Logging: Utilizes the Logger module to log important events and actions performed by users.
+  """
+
 
   @impl true
   def render(assigns) do
@@ -91,8 +105,34 @@ end
 
 
 @impl true
-def handle_event("grant_permission", %{"role_id" => role_id, "user_email" => user_email}, socket) do
+@doc """
+Handles the event of granting permission to a user.
+If successful, it logs the action, creates or updates the permission, and sends a success flash message.
+If unsuccessful, it sends an error flash message.
 
+Parameters:
+- "role_id": The ID of the role to grant.
+- "user_email": The email of the user to grant permission to.
+- socket: The LiveView socket.
+
+Returns:
+- {:noreply, socket}: The updated socket.
+- {:noreply, socket |> put_flash(:error, "Please try again later")}: In case of an error.
+
+-------
+
+Handles the event of removing a permission.
+It logs the action, removes the permission, and updates the permissions list for the todo.
+
+Parameters:
+- "id": The ID of the permission to remove.
+- socket: The LiveView socket.
+
+Returns:
+- {:noreply, socket}: The updated socket.
+"""
+def handle_event("grant_permission", %{"role_id" => role_id, "user_email" => user_email}, socket) do
+  Logger.info("User granted permission to: #{user_email} for the role_id: #{role_id}")
   user_id = fetch_user_id(user_email)
   if user_id == nil do
     {:noreply, socket |> put_flash(:error, "Please try again later")}
@@ -104,21 +144,21 @@ def handle_event("grant_permission", %{"role_id" => role_id, "user_email" => use
 end
 
 def handle_event("remove_permission", %{"id" => permission_id}, socket) do
-  IO.inspect(permission_id, label: "Permission deleted for id : ")
+  Logger.info("User removed the permission : #{permission_id}")
   TodoAppFull.Permissions.remove_permission(permission_id)
-  IO.inspect("Permission removed")
   permissions = TodoAppFull.Permissions.list_permissions_for_todo(socket.assigns.id)
   {:noreply, socket |> stream(:permissions, permissions, reset: true)}
 end
 
-  defp fetch_user_id(user_email) do
-    user = TodoAppFull.Accounts.get_user_by_email(user_email)
-    if user == nil do
-      nil
-    else
-      user.id
-    end
+# Retrieves the user ID based on the provided email address.
+defp fetch_user_id(user_email) do
+  user = TodoAppFull.Accounts.get_user_by_email(user_email)
+  if user == nil do
+    nil
+  else
+    user.id
   end
+end
 
 
 

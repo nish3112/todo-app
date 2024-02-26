@@ -2,156 +2,153 @@
 
   <.back navigate={~p"/todos"}>Back to todos</.back>
 
-<.header>
-  Sub todos for todo : <%= @todo.title %> 
-  
-</.header>
+  <.header>
+    Sub todos for todo : <%= @todo.title %>
+
+  </.header>
 
 
 
-<%= if @permission == "Unauthorized" || @permission == "Viewer" do %>
-  <.button disabled> New Sub task - NOT ALLOWED</.button>
-<% else %>
-  <.link patch={~p"/todos/#{@todo.id}/show/new"}>
-    <.button >New Sub task</.button>
-  </.link>
-<% end %>
-
-
-
-<.button phx-click={JS.dispatch("phx:copy", to: "#control-codes")}>  
-  Copy link
-</.button>
-
-
-<%= if @permission == "Creator" do %>
-  <.link patch={~p"/todos/#{@todo.id}/permissions"}>
-    <.button phx-click="shareSubtodos">  
-      Edit permissions
-    </.button>
-  </.link>
-<% else %>
-  <.button disabled phx-click="shareSubtodos">  
-    Edit permissions - disabled
-  </.button>
-
-<% end %>
-
-
-
-
-<br><br>
-
-
-<p>Permission: <%= @permission %> </p>
-
-<div class="main">
-  <div class="sub-todos">
-    <input type="text" id="control-codes" value={@todo.id} style="display: none;"/>
-    <div class="card-region" id="card-region" phx-update="stream">
-  
-      <%= for {id,subtask} <- @streams.subtasks do %>
-        <div class="card " phx-click="show_todo" phx-value-todo-id={subtask.id} id={id}>
-          <img src={~p"/images/static_bg.jpeg"} />
-          <p class="title">Title: <%= subtask.title %> </p>
-          <p class="body">Body: <%= subtask.body %></p>
-          <p class="status">Status: <%= subtask.status %> </p>
-          <.header>
-            <.button phx-click="delete" phx-value-subtask-id={subtask.id}>Delete</.button>
-          </.header>
-        </div>
+  <%= if @permission=="Unauthorized" || @permission=="Viewer" do %>
+    <.button disabled> New Sub task - NOT ALLOWED</.button>
+    <% else %>
+      <.link patch={~p"/todos/#{@todo.id}/show/new"}>
+        <.button>New Sub task</.button>
+      </.link>
       <% end %>
-      </div>
-  </div>
 
 
-  <div class="todos-edit-area">
-      <%= if @selected_subtask do %>
-      <div class="selected-todo">
-        <h2>Todo Details</h2>
-        <div id="messages">
-          <!-- the p tag is what sends the subtask id to js - DO NOT REMOVE-->
-          <p id="selected_subtask_id1" hidden ><strong>Id:</strong> <%= @selected_subtask.id %></p>
-          
-          
-          <%= if @permission == "Editor" || @permission == "Creator" do %>
-            <button class="edit-button" data-subtask-id={@selected_subtask.id}>Edit</button>
-          <% end %>
-          
-          <form id="editForm" phx-submit="save-inline">
-            <!-- The hidden field sends the subtask id to update the whole subtask -- DO NOT REMOVE-->
-            <label for="todo_id" type="hidden"></label>
-            <input id="todo_id" type="hidden" name="todo_id" value={@todo.id}>
-            <label for="selected_subtask_id" type="hidden"></label>
-            <input id="selected_subtask_id" type="hidden" name="selected_subtask_id" value={@selected_subtask.id}>
-            <div>
-              <label for="titleInput">Title:</label>
-              <input  id="titleInput" type="text" name="title" value={@selected_subtask.title} disabled>
-            </div>
-            <div>
-              <label for="statusInput">Status:</label>
-              <select id="statusInput" type="select" name="status" value={@selected_subtask.status} disabled>
-                <option value="on-hold">On-hold</option>
-                <option value="in-progress">In-progress</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-            <div>
-              <label for="bodyInput">Body:</label><br>
-              <textarea id="bodyInput" name="body" disabled>
+
+        <.button phx-click={JS.dispatch("phx:copy", to: "#control-codes" )}>
+          Copy link
+        </.button>
+
+
+        <%= if @permission=="Creator" do %>
+          <.link patch={~p"/todos/#{@todo.id}/permissions"}>
+            <.button phx-click="shareSubtodos">
+              Edit permissions
+            </.button>
+          </.link>
+          <% else %>
+            <.button disabled phx-click="shareSubtodos">
+              Edit permissions - disabled
+            </.button>
+
+            <% end %>
+
+
+
+
+              <br><br>
+
+
+              <p>Permission: <%= @permission %>
+              </p>
+
+              <div class="main">
+                <div class="sub-todos">
+                  <input type="text" id="control-codes" value={@todo.id} style="display: none;" />
+                  <div class="card-region" id="card-region" phx-update="stream">
+
+                    <%= for {id,subtask} <- @streams.subtasks do %>
+                      <div class="card " phx-click="show_todo" phx-value-todo-id={subtask.id} id={id}>
+                        <img src={~p"/images/static_bg.jpeg"} />
+                        <p class="title">Title: <%= subtask.title %>
+                        </p>
+                        <p class="body">Body: <%= subtask.body %>
+                        </p>
+                        <p class="status">Status: <%= subtask.status %>
+                        </p>
+                        <.header>
+                          <.button phx-click="delete" phx-value-subtask-id={subtask.id}>Delete</.button>
+                        </.header>
+                      </div>
+                      <% end %>
+                  </div>
+                </div>
+
+
+                <div class="todos-edit-area">
+                  <%= if @selected_subtask do %>
+                    <div class="selected-todo">
+                      <h2>Todo Details</h2>
+                      <div id="messages">
+                        <!-- the p tag is what sends the subtask id to js - DO NOT REMOVE-->
+                        <p id="selected_subtask_id1" hidden><strong>Id:</strong>
+                          <%= @selected_subtask.id %>
+                        </p>
+
+
+                        <%= if @permission=="Editor" || @permission=="Creator" do %>
+                          <button class="edit-button" data-subtask-id={@selected_subtask.id}>Edit</button>
+                          <% end %>
+
+                            <form id="editForm" phx-submit="save-inline">
+                              <!-- The hidden field sends the subtask id to update the whole subtask -- DO NOT REMOVE-->
+                              <label for="todo_id" type="hidden"></label>
+                              <input id="todo_id" type="hidden" name="todo_id" value={@todo.id}>
+                              <label for="selected_subtask_id" type="hidden"></label>
+                              <input id="selected_subtask_id" type="hidden" name="selected_subtask_id"
+                                value={@selected_subtask.id}>
+                              <div>
+                                <label for="titleInput">Title:</label>
+                                <input id="titleInput" type="text" name="title" value={@selected_subtask.title}
+                                  disabled>
+                              </div>
+                              <div>
+                                <label for="statusInput">Status:</label>
+                                <select id="statusInput" type="select" name="status" value={@selected_subtask.status}
+                                  disabled>
+                                  <option value="on-hold">On-hold</option>
+                                  <option value="in-progress">In-progress</option>
+                                  <option value="completed">Completed</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label for="bodyInput">Body:</label><br>
+                                <textarea id="bodyInput" name="body" disabled>
                 <%= @selected_subtask.body %>
               </textarea>
-            </div>
-            
-            <%= if @permission == "Editor" || @permission == "Creator" do %>
-              <button type="submit">Save</button>
-            <% end %>
-          </form>
-        </div>
-        
+                              </div>
 
-      </div>
-    <% end %>
-  </div>
+                              <%= if @permission=="Editor" || @permission=="Creator" do %>
+                                <button type="submit">Save</button>
+                                <% end %>
+                            </form>
+                      </div>
 
 
-
-
-  
-
-</div>
-
-
-<.modal :if={@live_action in [:new, :sub_edit]} id="new-subtask-modal" show on_cancel={JS.patch(~p"/todos/#{@todo.id}")}>
-  <div>
-    <.live_component
-      module={TodoAppFullWeb.TodoLive.SubtaskFormComponent}
-      id={@todo.id || :new }
-      subtask={@subtask.id || nil}
-      title="New Subtask Form"
-      action={@live_action}
-      todo={@todo}
-      subtask={@subtask}
-      patch={~p"/todos/#{@todo.id}"}
-    />
-  </div>
-</.modal>
+                    </div>
+                    <% end %>
+                </div>
 
 
 
-<.modal :if={@live_action in [:permissions]} id="permission-modal" show on_cancel={JS.patch(~p"/todos/#{@todo.id}")}>
-  <div>
-    <.live_component
-      module={TodoAppFullWeb.TodoLive.PermissionFormComponent}
-      id={@todo.id}
-      permission={@permission}
-      title="New Permission Form"
-      action={@live_action}
-      patch={~p"/todos/#{@todo.id}"}
-    />
-  </div>
-</.modal>
+
+
+
+              </div>
+
+
+              <.modal :if={@live_action in [:new, :sub_edit]} id="new-subtask-modal" show
+                on_cancel={JS.patch(~p"/todos/#{@todo.id}")}>
+                <div>
+                  <.live_component module={TodoAppFullWeb.TodoLive.SubtaskFormComponent} id={@todo.id || :new }
+                    subtask={@subtask.id || nil} title="New Subtask Form" action={@live_action} todo={@todo}
+                    subtask={@subtask} patch={~p"/todos/#{@todo.id}"} />
+                </div>
+              </.modal>
+
+
+
+              <.modal :if={@live_action in [:permissions]} id="permission-modal" show
+                on_cancel={JS.patch(~p"/todos/#{@todo.id}")}>
+                <div>
+                  <.live_component module={TodoAppFullWeb.TodoLive.PermissionFormComponent} id={@todo.id}
+                    permission={@permission} title="New Permission Form" action={@live_action}
+                    patch={~p"/todos/#{@todo.id}"} />
+                </div>
+              </.modal>
 
 </div>
-
-

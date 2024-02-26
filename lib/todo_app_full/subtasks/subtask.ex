@@ -5,6 +5,11 @@ defmodule TodoAppFull.Subtasks.Subtask do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
+
+  @moduledoc """
+  This module defines the schema for subtasks.
+  """
+
   schema "subtasks" do
     field :status, :string
     field :title, :string

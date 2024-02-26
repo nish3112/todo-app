@@ -1,6 +1,11 @@
 defmodule TodoAppFull.Todos do
   @moduledoc """
   The Todos context.
+
+  The TodoAppFull.Todos module serves as the context for managing todos within the TodoAppFull application.
+  It provides functions for listing todos, fetching a single todo, creating new todos, updating existing todos,
+  deleting todos, and generating changesets for tracking todo changes.
+  These functions encapsulate the CRUD (Create, Read, Update, Delete) operations for todos.
   """
 
   import Ecto.Query, warn: false

@@ -1,6 +1,10 @@
 defmodule TodoAppFull.Subtasks do
   @moduledoc """
   The Todos context.
+  The TodoAppFull.Subtasks module manages subtasks within the TodoAppFull application.
+  It provides functions for listing subtasks for a given todo, fetching a single subtask, creating new subtasks,
+  updating existing subtasks, deleting subtasks, and generating changesets for tracking subtask changes.
+  These functions encapsulate the CRUD (Create, Read, Update, Delete) operations for subtasks.
   """
 
   import Ecto.Query, warn: false

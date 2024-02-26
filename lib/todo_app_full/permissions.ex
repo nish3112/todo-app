@@ -1,6 +1,9 @@
 defmodule TodoAppFull.Permissions do
   @moduledoc """
   The Permissions context.
+  The TodoAppFull.Permissions module is responsible for managing permissions within the application.
+  It facilitates operations such as creating, retrieving, updating, and deleting permissions associated with users and todos.
+  Additionally, it offers functionality to check the type of permission granted to a user for a specific todo and to list permissions related to a particular todo.
   """
 
   import Ecto.Query, warn: false
@@ -41,6 +44,17 @@ defmodule TodoAppFull.Permissions do
     end
   end
 
+  @doc """
+  Creates or updates a permission record for a user and a todo.
+
+  Returns the permissions associated with the todo after the operation.
+
+  ## Examples
+
+      iex> create_or_update_permission(user_id, todo_id, role_id)
+      [%Permission{}, ...] --> Change this
+  """
+
   def create_or_update_permission(user_id, todo_id, role_id) do
     case Repo.get_by(Permission, user_id: user_id, todo_id: todo_id) do
       nil ->
@@ -71,11 +85,33 @@ defmodule TodoAppFull.Permissions do
   end
 
 
+  @doc """
+  Removes a permission.
+
+  Returns `:ok` upon successful removal.
+
+  ## Examples
+
+      iex> remove_permission(permission_id)
+      :ok
+  """
   def remove_permission(permission_id) do
     permission = Repo.get!(Permission, permission_id)
     Repo.delete(permission)
   end
 
+
+  @doc """
+  Lists permission associated with a specific todo.
+
+  Returns a list of permissions.
+
+  ## Examples
+
+      iex> list_permissions_for_todo(todo_id)
+      [%Permission{}, ...]
+  """
+  # MAKE IT REPO.ONE --> It will always return be a single permission
 
   def list_permissions_for_todo(todo_id) do
     Repo.all(from p in Permission,

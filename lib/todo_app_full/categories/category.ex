@@ -5,6 +5,9 @@ defmodule TodoAppFull.Categories.Category do
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
+  @moduledoc """
+  This module defines the schema for categories.
+  """
   schema "categories" do
     field :category_name, :string
     has_many :todos, TodoAppFull.Todos.Todo
