@@ -23,7 +23,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
-    Logger.info("User visited the home page")
+    Appsignal.Logger.info("Index Page", "User #{socket.assigns.current_user.id} visited the home page")
     categories = Categories.list_categories()
     socket =  socket
               |> assign(bookmark: false)
@@ -48,7 +48,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   # Applies the 'edit' action to the socket.
   # Prepares the socket for editing a todo based on the provided todo ID.
   defp apply_action(socket, :edit, %{"id" => id}) do
-    Logger.info("User edited a todo: #{id}")
+    Appsignal.Logger.info("Index Page", "User: #{socket.assigns.current_user.id} edited a todo: #{id}")
     socket
     |> assign(:page_title, "Edit Todo")
     |> assign(:todo, Todos.get_todo!(id))
@@ -58,7 +58,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   # Applies the 'new' action to the socket.
   # Prepares the socket for creating a new todo.
   defp apply_action(socket, :new, _params) do
-    Logger.info("User created a new todo")
+    Appsignal.Logger.info("Index Page","User #{socket.assigns.current_user.id} created a new todo")
     socket
     |> assign(:page_title, "New Todo")
     |> assign(:todo, %Todo{})
@@ -67,7 +67,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   # Applies the 'index' action to the socket.
   # Prepares the socket for listing todos.
   defp apply_action(socket, :index, _params) do
-    Logger.info("User visited the home page")
+    Appsignal.Logger.info("Index Page", "User#{socket.assigns.current_user.id} visited the home page :index")
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     {sorted_todos, socket} = paginate_and_sorted_todos(todos, socket)
 
@@ -117,14 +117,14 @@ defmodule TodoAppFullWeb.TodoLive.Index do
       A tuple `{:noreply, updated_socket}` indicating the updated socket state.
    """
   def handle_event("delete", %{"id" => id}, socket) do
-    Logger.info("User deleted the todo: #{id}")
+    Appsignal.Logger.info("Index Page", "User #{socket.assigns.current_user.id} deleted the todo: #{id}")
     todo = Todos.get_todo!(id)
     {:ok, _} = Todos.delete_todo(todo)
     {:noreply, stream_delete(socket, :todos, todo)}
   end
 
   def handle_event("search", %{"title" => title}, socket) do
-    Logger.info("User searched for: #{title}")
+    Appsignal.Logger.info("Index Page","User searched for: #{title}")
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     filtered_todos = Enum.filter(todos, fn todo ->
       String.downcase(todo.title) |> String.contains?(String.downcase(title))
@@ -138,7 +138,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   end
 
   def handle_event("togglelike", %{"todo_id" => todo_id}, socket) do
-    Logger.info("User liked/unliked the todo: #{todo_id}")
+    Appsignal.Logger.info("Index Page","User #{socket.assigns.current_user.id} liked/unliked the todo: #{todo_id}")
     todo = TodoAppFull.Todos.get_todo!(todo_id)
     updated_attrs = %{"liked" => !todo.liked}
     {:ok, updated_todo} = TodoAppFull.Repo.get_by(TodoAppFull.Todos.Todo, id: todo_id)
@@ -149,7 +149,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
   end
 
   def handle_event("bookmark", _params, socket) do
-    Logger.info("User clicked the bookmark")
+    Appsignal.Logger.info("Index Page","User #{socket.assigns.current_user.id} clicked the bookmark")
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     is_bookmark = socket.assigns[:bookmark]
     bookmark_todos = Enum.filter(todos, fn todo -> todo.liked == true end)
@@ -169,7 +169,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
     update_page_num = socket.assigns.page_number + 1
     if has_more_todos?(socket, update_page_num) do
-      Logger.info("User moved to the next page: #{update_page_num}")
+      Appsignal.Logger.info("Index Page","User #{socket.assigns.current_user.id} moved to the next page: #{update_page_num}")
       updated_socket = assign(socket, page_number: update_page_num)
       pagination_helper(updated_socket)
     else
@@ -182,28 +182,28 @@ defmodule TodoAppFullWeb.TodoLive.Index do
     update_page_num = socket.assigns.page_number - 1
     if update_page_num < 0 do
       updated_socket = assign(socket, page_number: 0)
-      Logger.info("User moved to the previous page: 0")
+      Appsignal.Logger.info("Index Page","User #{socket.assigns.current_user.id} moved to the previous page: 0")
       pagination_helper(updated_socket)
       {:noreply, updated_socket}
     else
-      Logger.info("User moved to the previous page: #{update_page_num}")
+      Appsignal.Logger.info("Index Page","User moved to the previous page: #{update_page_num}")
       updated_socket = assign(socket, page_number: update_page_num)
       pagination_helper(updated_socket)
     end
   end
 
   def handle_event("sortTodos",%{"status" => status}, socket) do
-    Logger.info("User filtered according to status: #{status}")
+    Appsignal.Logger.info("Index Page","User #{socket.assigns.current_user.id} filtered according to status: #{status}")
     handle_sort_todos(socket, status , nil)
   end
 
   def handle_event("sortTodos",%{"category" => category}, socket) do
-    Logger.info("User filtered according to category: #{category}")
+    Appsignal.Logger.info("Index Page","User #{socket.assigns.current_user.id} filtered according to category: #{category}")
     handle_sort_todos(socket, nil ,category)
   end
 
   def handle_event("sortTodos", %{"category" => category, "status" => status}, socket) do
-    Logger.info("User filtered according to status: #{status} and category: #{category}")
+    Appsignal.Logger.info("Index Page","User #{socket.assigns.current_user.id} filtered according to status: #{status} and category: #{category}")
     handle_sort_todos(socket, status, category)
   end
 
@@ -213,7 +213,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   # Helper function to determine if there are more todos available for pagination.
   defp has_more_todos?(socket, page_number) do
-    Logger.info("Helper function - has more todos called")
+    Appsignal.Logger.info("Index Page","Helper function - has more todos called")
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     total_todos_count = length(todos)
     current_page_start = page_number * 8
@@ -222,7 +222,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   # Helper function to sort and filter todos based on status and category.
   defp handle_sort_todos(socket, status, category) do
-    Logger.info("Helper function - handle sort todos called")
+    Appsignal.Logger.info("Index Page", "Helper function - handle sort todos called")
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
 
     filtered_todos =
@@ -244,7 +244,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   # Helper function to paginate and sort todos.
   defp paginate_and_sorted_todos(todos, socket) do
-    Logger.info("Helper function - paginate and sorted todos called")
+    Appsignal.Logger.info("Index Page","Helper function - paginate and sorted todos called")
     sorted_todos = todos
                   |> Enum.sort_by(&(&1.updated_at), Date)
                   |> Enum.reverse()
@@ -254,7 +254,7 @@ defmodule TodoAppFullWeb.TodoLive.Index do
 
   # Helper function to handle pagination.
   defp pagination_helper(socket) do
-    Logger.info("Helper function - pagination helper called")
+    Appsignal.Logger.info("Index Page","Helper function - pagination helper called")
     todos = Accounts.get_user_by_session_token(socket.assigns.session_id).todos
     {sorted_todos, socket} = paginate_and_sorted_todos(todos, socket)
     {:noreply, stream(socket,:todos, sorted_todos, reset: true)}

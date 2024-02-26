@@ -99,7 +99,6 @@ defmodule TodoAppFullWeb.TodoLive.PermissionFormComponent do
   @impl true
 def update(assigns, socket) do
   permissions = TodoAppFull.Permissions.list_permissions_for_todo(assigns[:id])
-  IO.inspect(permissions)
   {:ok, socket |> stream(:permissions, permissions) |> assign(:id, assigns[:id])}
 end
 
@@ -132,21 +131,22 @@ Returns:
 - {:noreply, socket}: The updated socket.
 """
 def handle_event("grant_permission", %{"role_id" => role_id, "user_email" => user_email}, socket) do
-  Logger.info("User granted permission to: #{user_email} for the role_id: #{role_id}")
   user_id = fetch_user_id(user_email)
   if user_id == nil do
+    Appsignal.Logger.error("Permission modal","User was not able to grant permission to: #{user_email} for the role_id: #{role_id}")
     {:noreply, socket |> put_flash(:error, "Please try again later")}
   else
     updated_permission = TodoAppFull.Permissions.create_or_update_permission(user_id,socket.assigns.id,role_id)
+    Appsignal.Logger.info("Permission modal","User granted permission to: #{user_email} for the role_id: #{role_id}")
     {:noreply, socket |> stream(:permissions, updated_permission) |> put_flash(:info, "Permission shared")}
   end
 
 end
 
 def handle_event("remove_permission", %{"id" => permission_id}, socket) do
-  Logger.info("User removed the permission : #{permission_id}")
   TodoAppFull.Permissions.remove_permission(permission_id)
   permissions = TodoAppFull.Permissions.list_permissions_for_todo(socket.assigns.id)
+  Appsignal.Logger.info("Permission modal","User removed the permission : #{permission_id}")
   {:noreply, socket |> stream(:permissions, permissions, reset: true)}
 end
 
@@ -155,7 +155,9 @@ defp fetch_user_id(user_email) do
   user = TodoAppFull.Accounts.get_user_by_email(user_email)
   if user == nil do
     nil
+    Appsignal.Logger.warning("Permission modal","User not found: #{user_email}")
   else
+    Appsignal.Logger.warning("Permission modal","User found: #{user_email}, granting permission next")
     user.id
   end
 end

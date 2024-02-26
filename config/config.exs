@@ -56,6 +56,13 @@ config :tailwind,
     cd: Path.expand("../assets", __DIR__)
   ]
 
+# Configures appsignal
+config :appsignal,
+  enabled: true,
+  rewrite_frames: false,
+  api_key: System.get_env("APPSIGNAL_PUSH_API_KEY"),
+  environment: Mix.env()
+
 # Configures Elixir's Logger
 config :logger, :console,
   level: :info,

@@ -105,10 +105,12 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
       |> Todos.change_todo(todo_params)
       |> Map.put(:action, :validate)
 
+    Appsignal.Logger.info("Todo form","Todo form validated")
     {:noreply, assign_form(socket, changeset)}
   end
 
   def handle_event("save", %{"todo" => todo_params}, socket) do
+    Appsignal.Logger.info("Todo form","Handle event save called")
     current_user_id = Accounts.get_user_by_session_token(socket.assigns.current_user).id
     updated_todo_params = Map.put_new(todo_params, "user_id", current_user_id)
     save_todo(socket, socket.assigns.action, updated_todo_params)
@@ -128,9 +130,9 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
   # Examples:
   #   save_todo(socket, :edit, %{title: "Updated Title", body: "Updated Body", status: "on-hold", liked: false})
   defp save_todo(socket, :edit, todo_params) do
-    dbg(todo_params)
     case Todos.update_todo(socket.assigns.todo, todo_params) do
       {:ok, todo} ->
+        Appsignal.Logger.info("Todo form","Todo edited")
         notify_parent({:saved, todo})
 
         {:noreply,
@@ -139,6 +141,7 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
+        Appsignal.Logger.error("Todo form","Todo was not edited")
         {:noreply, assign_form(socket, changeset)}
     end
   end
@@ -155,31 +158,37 @@ defmodule TodoAppFullWeb.TodoLive.FormComponent do
   #
   # Examples:
   #   save_todo(socket, :new,  %{title: "Updated Title", body: "Updated Body", status: "on-hold", liked: false})
+
   defp save_todo(socket, :new, todo_params) do
     current_user_id = Accounts.get_user_by_session_token(socket.assigns.current_user).id
     roles = Roles.fetch_roles()
 
     case Enum.find(roles, fn role -> role.role == "Creator" end) do
       nil ->
+        Appsignal.Logger.error("Todo form","Unable to find the creator role")
         {:noreply, socket |> put_flash(:error, "Some error occuured")}
 
       creator_role ->
         case Todos.create_todo(todo_params) do
           {:ok, todo} ->
+            Appsignal.Logger.info("Todo form","Todo created successfully - permissions left")
             notify_parent({:saved, todo})
 
             case Permissions.create_permission(current_user_id, todo.id, creator_role.id) do
               {:ok, _permission} ->
+                Appsignal.Logger.info("Todo form","Creator permission was provided to the todo creator")
                 {:noreply,
                  socket
                  |> put_flash(:info, "Todo created successfully")
                  |> push_patch(to: socket.assigns.patch)}
 
               {:error, _changeset} ->
+                Appsignal.Logger.error("Todo form","Failed to create permission")
                 {:noreply, socket |> put_flash(:error, "Failed to create permission")}
             end
 
           {:error, %Ecto.Changeset{} = changeset} ->
+            Appsignal.Logger.error("Todo form","Failed to create permission")
             {:noreply, assign_form(socket, changeset)}
         end
     end

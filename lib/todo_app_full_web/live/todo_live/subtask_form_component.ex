@@ -4,6 +4,7 @@ defmodule TodoAppFullWeb.TodoLive.SubtaskFormComponent do
   use TodoAppFullWeb, :live_component
 
 
+
   @moduledoc """
   This module `TodoAppFullWeb.TodoLive.SubtaskFormComponent` manages the LiveComponent responsible for rendering and handling subtask forms within the TodoAppFull application.
 
@@ -71,7 +72,7 @@ end
   """
 
   def handle_event("validate", %{"subtask" => subtask_params}, socket) do
-    Logger.info("Subtask form validated")
+    Appsignal.Logger.info("Subtask Form","Subtask form validated")
     subtask_params = Map.put(subtask_params, "todo_id", socket.assigns.todo.id)
     changeset =
       socket.assigns.subtask
@@ -88,17 +89,19 @@ end
 
   # Handles the saving of a new subtask based on user input.
   defp save_todo(socket, :new, subtask_params) do
-    Logger.info("user created a new subtask")
+    IO.inspect(subtask_params)
+    Appsignal.Logger.info("Subtask Form","User is trying to create a new subtask for the : #{subtask_params.todo_id}")
     case TodoAppFull.Subtasks.create_subtask(subtask_params) do
       {:ok, todo} ->
         Phoenix.PubSub.broadcast(TodoAppFull.PubSub, socket.assigns.id, {:saved,todo})
-
+        Appsignal.Logger.info("Subtask Form","User created a new subtask for the : #{subtask_params.todo_id}")
         {:noreply,
          socket
          |> put_flash(:info, "Subtask created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
+        Appsignal.Logger.error("Subtask Form","User was unable to create a new subtask for the : #{subtask_params.todo_id}")
         {:noreply, assign_form(socket, changeset)}
     end
   end

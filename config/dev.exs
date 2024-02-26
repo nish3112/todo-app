@@ -2,10 +2,10 @@ import Config
 
 # Configure your database
 config :todo_app_full, TodoAppFull.Repo,
-  username: "nishiththakker",
-  password: "postgres",
+  username: System.get_env("POSTGRES_USERNAME"),
+  password: System.get_env("POSTGRES_PASSWORD"),
   hostname: "localhost",
-  database: "todo_app_full_dev",
+  database: System.get_env("POSTGRES_DATABASE"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

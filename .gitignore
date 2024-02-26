@@ -35,3 +35,4 @@ todo_app_full-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/dev.env

@@ -59,6 +59,8 @@ defmodule TodoAppFull.MixProject do
       {:flop_phoenix, "~> 0.22.6"},
       {:excoveralls, "~> 0.18.0"},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+      {:appsignal, "~> 2.8"},
+      {:appsignal_phoenix, "~> 2.0"}
    ]
   end
 

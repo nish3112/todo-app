@@ -14,12 +14,14 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
   """
 
+  on_mount {TodoAppFullWeb.UserAuth, :mount_current_user}
+
 
   @impl true
   def mount(params, session, socket) do
     %{"id" => id} = params
     Phoenix.PubSub.subscribe(TodoAppFull.PubSub, id)
-    Logger.info("User joined the default room")
+    Appsignal.Logger.info("Subtask Page - show","User #{socket.assigns.current_user.id} joined the default room")
     current_user = TodoAppFull.Accounts.get_user_by_session_token(session["user_token"])
     permission = TodoAppFull.Permissions.check_permission(current_user.id, id)
     updated_socket = socket
@@ -66,13 +68,13 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   defp apply_action(socket, :show, params) do
     %{"id" => id} = params
     if socket.assigns.permission == nil || socket.assigns.permission == "Unauthorized" do
-      Logger.warning("User opened the todo: #{id} and was denied access")
+      Appsignal.Logger.warning("Subtask Page - show","User #{socket.assigns.current_user.id} opened the todo: #{id} and was denied access")
       socket
         |> assign(:page_title, page_title(socket.assigns.live_action))
         |> assign(:todo, %TodoAppFull.Todos.Todo{})
         |> stream(:subtasks, [])
     else
-      Logger.info("User opened the todo: #{id} and was granted access")
+      Appsignal.Logger.info("Subtask Page - show","User #{socket.assigns.current_user.id} opened the todo: #{id} and was granted access")
       socket
       |> assign(:page_title, page_title(socket.assigns.live_action))
       |> assign(:todo, TodoAppFull.Todos.get_todo!(id))
@@ -82,7 +84,7 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
   # Handles the action for opening a new subtask modal.
   defp apply_action(socket, :new, _params) do
-    Logger.info("User opened new subtask modal")
+    Appsignal.Logger.info("Subtask Page - show","User #{socket.assigns.current_user.id} opened new subtask modal")
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:subtask, %TodoAppFull.Subtasks.Subtask{})
@@ -91,9 +93,9 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   # Handles the action for opening an edit subtask modal.
   defp apply_action(socket, :sub_edit, params) do
     %{"task_id" => task_id} = params
-    Logger.info("User opened edit subtask modal (subtask id: #{task_id}) ")
+    Appsignal.Logger.info("Subtask Page - show", "User#{socket.assigns.current_user.id} opened edit subtask modal (subtask id: #{task_id}) ")
 
-      #  You are not using this function for edit 90% --> Confirm this
+    #  You are not using this function for edit 90% --> Confirm this
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:subtask, TodoAppFull.Subtasks.get_subtask!(task_id))
@@ -101,7 +103,7 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
   # Handles the action for opening an edit permissions modal.
   defp apply_action(socket, :permissions, _params) do
-    Logger.info("User opened edit permissions modal ")
+    Appsignal.Logger.info("Subtask Page - show","User #{socket.assigns.current_user.id} opened edit permissions modal ")
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
   end
@@ -137,7 +139,7 @@ defmodule TodoAppFullWeb.TodoLive.Show do
   """
 
   def handle_event("delete", %{"subtask-id" => subtask_id}, socket) do
-    Logger.info("User deleted the subtask id: #{subtask_id}")
+    Appsignal.Logger.info("Subtask Page - show","User #{socket.assigns.current_user.id} deleted the subtask id: #{subtask_id}")
     subtask = TodoAppFull.Subtasks.get_subtask!(subtask_id)
     TodoAppFull.Subtasks.delete_subtask(subtask)
     Phoenix.PubSub.broadcast(TodoAppFull.PubSub, socket.assigns.id,{:delete_subtask, subtask})
@@ -147,8 +149,8 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
 
   def handle_event("show_todo", %{"todo-id" => subtask_id}, socket) do
-    Logger.info("User clicked on the subtask id: #{subtask_id}")
     sub_task = TodoAppFull.Subtasks.get_subtask!(subtask_id)
+    Appsignal.Logger.info("Subtask Page - show","User #{socket.assigns.current_user.id} clicked on the subtask id: #{subtask_id}")
     {:noreply, assign(socket, :selected_subtask, sub_task)}
   end
 
@@ -159,19 +161,20 @@ defmodule TodoAppFullWeb.TodoLive.Show do
 
 
   def handle_event("save-inline", todo_params, socket) do
-    Logger.info("User saved the subtask id: #{todo_params["selected_subtask_id"]}")
+    Appsignal.Logger.info("Subtask Page - show","User #{socket.assigns.current_user.id} is trying to save the subtask id: #{todo_params["selected_subtask_id"]}")
     get_subtask = TodoAppFull.Subtasks.get_subtask!(todo_params["selected_subtask_id"])
     updated_todo_params = Map.delete(todo_params, "selected_subtask_id")
     case TodoAppFull.Subtasks.update_subtask(get_subtask, updated_todo_params) do
       {:ok, subtask} ->
         Phoenix.PubSub.broadcast(TodoAppFull.PubSub, socket.assigns.id,{:update_subtask, subtask})
-
+        Appsignal.Logger.info("Subtask Page - show","User #{socket.assigns.current_user.id} saved the subtask id: #{todo_params["selected_subtask_id"]}")
         {:noreply,
          socket
          |> put_flash(:info, "Subtask updated successfully")
       }
 
       {:error, %Ecto.Changeset{} = changeset} ->
+          Appsignal.Logger.error("Subtask Page - show","User #{socket.assigns.current_user.id} was not able to save the subtask id: #{todo_params["selected_subtask_id"]}")
           {:noreply, assign_form(socket, changeset)}
     end
   end
