@@ -146,6 +146,7 @@ end
 def handle_event("remove_permission", %{"id" => permission_id}, socket) do
   TodoAppFull.Permissions.remove_permission(permission_id)
   permissions = TodoAppFull.Permissions.list_permissions_for_todo(socket.assigns.id)
+  # PUBSUB - Todo - channel -- User id
   Appsignal.Logger.info("Permission modal","User removed the permission : #{permission_id}")
   {:noreply, socket |> stream(:permissions, permissions, reset: true)}
 end

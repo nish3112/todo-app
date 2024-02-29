@@ -89,19 +89,18 @@ end
 
   # Handles the saving of a new subtask based on user input.
   defp save_todo(socket, :new, subtask_params) do
-    IO.inspect(subtask_params)
-    Appsignal.Logger.info("Subtask Form","User is trying to create a new subtask for the : #{subtask_params.todo_id}")
+    Appsignal.Logger.info("Subtask Form","User is trying to create a new subtask for the : #{subtask_params["todo_id"]}")
     case TodoAppFull.Subtasks.create_subtask(subtask_params) do
       {:ok, todo} ->
         Phoenix.PubSub.broadcast(TodoAppFull.PubSub, socket.assigns.id, {:saved,todo})
-        Appsignal.Logger.info("Subtask Form","User created a new subtask for the : #{subtask_params.todo_id}")
+        Appsignal.Logger.info("Subtask Form","User created a new subtask for the : #{subtask_params["todo_id"]}")
         {:noreply,
          socket
          |> put_flash(:info, "Subtask created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        Appsignal.Logger.error("Subtask Form","User was unable to create a new subtask for the : #{subtask_params.todo_id}")
+        Appsignal.Logger.error("Subtask Form","User was unable to create a new subtask for the : #{subtask_params["todo_id"]}")
         {:noreply, assign_form(socket, changeset)}
     end
   end

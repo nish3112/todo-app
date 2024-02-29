@@ -93,6 +93,13 @@ defmodule TodoAppFull.Accounts do
     User.registration_changeset(user, attrs, hash_password: false, validate_email: false)
   end
 
+
+  def get_user_with_api_key(api_key) do
+    Repo.get_by(User, api_key: api_key)
+  end
+
+
+
   ## Settings
 
   @doc """

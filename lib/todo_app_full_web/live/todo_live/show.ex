@@ -57,7 +57,8 @@ defmodule TodoAppFullWeb.TodoLive.Show do
       {:noreply, socket |> stream_insert(:subtasks, todo)}
   end
 
-
+  # HANDLE PERMISSION INFO :permission
+  # LISTEN PUBSUB FOR CHANNEL TODO.ID -> bydefault unauthorized
 
   @impl true
   def handle_params(params, _, socket) do

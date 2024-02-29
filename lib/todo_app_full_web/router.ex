@@ -1,6 +1,5 @@
 defmodule TodoAppFullWeb.Router do
   use TodoAppFullWeb, :router
-
   import TodoAppFullWeb.UserAuth
 
   pipeline :browser do
@@ -36,14 +35,20 @@ defmodule TodoAppFullWeb.Router do
     live "/todos/:id/permissions", TodoLive.Show, :permissions
 
     live "/error", ErrorLive, :index
-
-
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", TodoAppFullWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", TodoAppFullWeb do
+    pipe_through :browser
+    get "/register", ApiController, :api_register
+  end
+
+  scope "/api", TodoAppFullWeb do
+    pipe_through :api
+
+    get "/example", ApiController, :index
+
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:todo_app_full, :dev_routes) do
